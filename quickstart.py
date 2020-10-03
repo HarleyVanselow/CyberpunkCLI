@@ -24,39 +24,85 @@ def gc(target, property):
 
 @route.command()
 @click.argument('target')
-def connect(target):
+@click.option('--auth', default=None)
+def connect(target, auth):
     with open(f'./flavor_text/{target}.json') as target:
         target = json.load(target)
-        display(target)
+        admin = 'access_code' in target.keys() and auth == target['access_code']
+        Base(target, admin).get_type().display()
 
 
-def display(target):
-    if target['type'] == 'item':
-        print(f'Buy {target["flavor"]}?')
-    else:
-        print(target['flavor'])
-    if 'options' in target.keys():
-        user_done = False
-        while not user_done:
-            for i, option in enumerate(target['options']):
-                print(f'{i+1}) {get_summary(option)}')
-            choice = click.prompt('')
-            display(target['options'][int(choice)-1])
-            user_done = click.confirm('Exit?')
+class Base:
+    def display(self):
+        if self.admin_flavor != '' and self.admin:
+            print(self.admin_flavor)
+        else:
+            print(self.flavor)
+
+    def get_summary(self):
+        return self.flavor
+
+    def display_options(self):
+        if self.options:
+            user_done = False
+            while not user_done:
+                for i, option in enumerate(self.options):
+                    option = Base(option, self.admin).get_type()
+                    print(f'{i+1}) {option.get_summary()}')
+                print('Or q to quit')
+                choice = click.prompt('')
+                if choice == 'q':
+                    return
+                Base(self.options[int(choice)-1], self.admin).get_type().display()
+                user_done = click.confirm('Exit?')
+
+    def __init__(self,target, admin):
+        self.type = target['type']
+        self.target = target
+        self.flavor = target['flavor']
+        self.admin_flavor = target.get('admin_flavor', '')
+        self.options = target.get('options', [])
+        self.admin = admin
+
+    def get_type(self):
+        if self.type == 'store':
+            return Store(self.target, self.admin)
+        elif self.type == 'info':
+            return Info(self.target, self.admin)
+        elif self.type == 'item':
+            return Item(self.target, self.admin)
 
 
-def get_summary(target):
-    if target['type'] == 'item':
-        return display_item(target)
-    elif target['type'] == 'info':
-        return target['header']
+class Store(Base):
+    def display(self):
+        super().display()
+        super().display_options()
+
+    def __init__(self, target, admin):
+        super().__init__(target,admin)
+        self.money = target['money']
 
 
-def display_item(target):
-    if target['cost'] is None:
-        return target['flavor']
-    else:
-        return f"{target['flavor']}: ${target['cost']}"
+class Info(Base):
+    def display(self):
+        super().display()
+        super().display_options()
+    def get_summary(self):
+        return self.header
+    def __init__(self, target, admin):
+        super().__init__(target,admin)
+        self.header = target.get('header', target['flavor'])
+
+
+class Item(Base):
+    def display(self):
+        print(f"{self.cost} eb has been deducted. Enjoy your {self.flavor}")
+    def get_summary(self):
+        return f'{self.flavor}: {self.cost} eb'
+    def __init__(self,target, admin):
+        super().__init__(target, admin)
+        self.cost = target['cost']
+        pass
 
 
 def query_character(character, property, service):
