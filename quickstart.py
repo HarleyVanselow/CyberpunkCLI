@@ -4,8 +4,10 @@ import json
 from googleapiclient.discovery import build
 import click
 
-api_key = ''
-sheet_id = ''
+# To connect to the google sheet with all the characters
+API_KEY = ''
+SHEET_ID = ''
+SERVICE = ''
 
 
 @click.group()
@@ -14,13 +16,17 @@ def route():
 
 
 @route.command()
-@click.argument('target')
+@click.argument('character')
 @click.argument('property')
-def gc(target, property):
-    service = build(
-        'sheets', 'v4', developerKey=api_key)
-    print(f'{target} has {query_character(target, property, service)} {property}')
+def qc(character, property):
+    print(f'{character} has {query_character(character, property)} {property}')
 
+@route.command()
+@click.argument('character')
+@click.argument('property')
+@click.argument('value')
+def uc(character, property, value):
+    update_character(character, property, value)
 
 @route.command()
 @click.argument('target')
@@ -56,7 +62,7 @@ class Base:
                 Base(self.options[int(choice)-1], self.admin).get_type().display()
                 user_done = click.confirm('Exit?')
 
-    def __init__(self,target, admin):
+    def __init__(self, target, admin):
         self.type = target['type']
         self.target = target
         self.flavor = target['flavor']
@@ -87,37 +93,67 @@ class Info(Base):
     def display(self):
         super().display()
         super().display_options()
+
     def get_summary(self):
         return self.header
+
     def __init__(self, target, admin):
         super().__init__(target,admin)
         self.header = target.get('header', target['flavor'])
 
 
 class Item(Base):
+    """
+    Item a player can buy at a store
+    """
     def display(self):
+        self.checkout()
         print(f"{self.cost} eb has been deducted. Enjoy your {self.flavor}")
+
+    def checkout(self):
+        character = os.system('whoami')
+        property = 'money'
+        update_character(character, property, SERVICE)
+
     def get_summary(self):
         return f'{self.flavor}: {self.cost} eb'
+
     def __init__(self,target, admin):
         super().__init__(target, admin)
         self.cost = target['cost']
         pass
 
 
-def query_character(character, property, service):
+def query_character(character, property):
     with open('sheet_map.json') as sheet_map:
         cell_map = json.load(sheet_map)
         query = cell_map[property]
-        sheet = service.spreadsheets()
-        result = sheet.values().get(spreadsheetId=sheet_id,
+        sheet = SERVICE.spreadsheets()
+        result = sheet.values().get(spreadsheetId=SHEET_ID,
                                     range=f'{character}!{query}').execute()
         return result['values'][0][0]
+
+
+def update_character(character, property, value):
+    with open('sheet_map.json') as sheet_map:
+        cell_map = json.load(sheet_map)
+        query = cell_map[property]
+        body = {'values': value}
+        sheet = SERVICE.spreadsheets()
+        result = sheet.values().update(
+            spreadsheetId=SHEET_ID, 
+            range=f'{character}!{query}',
+            valueInputOption='USER_ENTERED', 
+            body=body
+        ).execute()
+    print('{0} cells updated.'.format(result.get('updatedCells')))
+    print(f'{character} has {query_character(character, property)} {property}')
 
 
 if __name__ == '__main__':
     with open('./credentials.json') as creds:
         creds = json.load(creds)
-        api_key = creds['api_key']
-        sheet_id = creds['sheet_id']
+        API_KEY = creds['api_key']
+        SHEET_ID = creds['sheet_id']
+        SERVICE = build('sheets', 'v4', developerKey=API_KEY)
     route()
