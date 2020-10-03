@@ -1,0 +1,15 @@
+{
+    "type": "info",
+    "flavor":"Night City offers a variety of exciting places to visit! To learn more, select one",
+    "options":[
+        {
+            "type":"info",
+            "header":"The Sewers",
+            "flavor":"The sewers are incredibly scenic"
+        },{
+            "type":"info",
+            "header":"The Docks",
+            "flavor":"The Docks are next to water"
+        }
+    ]
+}

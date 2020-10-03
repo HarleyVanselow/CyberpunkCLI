@@ -1,0 +1,13 @@
+{
+    "type": "store",
+    "flavor": "Welcome to Weyland Yutani Refreshements, please select a purchase",
+    "access_code": "prometheus",
+    "money":200,
+    "options":[
+        {
+            "type":"item",
+            "flavor":"Pepsi",
+            "cost":50
+        }
+    ]
+}
