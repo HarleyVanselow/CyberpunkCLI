@@ -156,15 +156,20 @@ class Item(Base):
     def display(self):
         # import pdb; pdb.set_trace()
         self.checkout()
-        print(f"{self.cost} eb has been deducted. Enjoy your {self.flavor}")
 
     def checkout(self):
         character = getpass.getuser()
         balance = int(query_character(character, "money")
-                      [0][0]) - int(self.cost)
-        update_character(character, "money", [balance])
-        update_character(character, "gear", [
-                         self.flavor, self.cost, self.weight])
+                      [0][0]) 
+        cost = int(self.cost)
+        if balance < cost:
+            print("Insufficient funds: Come back when you get some money, buddy!")
+        else:
+            balance -= cost
+            update_character(character, "money", [balance])
+            update_character(character, "gear", [
+                            self.flavor, self.cost, self.weight])
+            print(f"{self.cost} eb has been deducted. Enjoy your {self.flavor}")
 
     def get_display_fields(self):
         return {"flavor": "Name", "cost": "Price (eb)", "weight": "Weight (kg)"}
@@ -176,11 +181,11 @@ class Item(Base):
         pass
 
 
-class Gear(Item):
-    def __init__(self, )
+# class Gear(Item):
+#     def __init__(self, )
 
-    def get_type_name(self):
-        return "Gear"
+#     def get_type_name(self):
+#         return "Gear"
 
     
 
