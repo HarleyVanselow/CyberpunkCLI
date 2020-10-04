@@ -7,6 +7,7 @@ import httplib2
 import os
 import getpass
 
+from tabulate import tabulate
 from apiclient import discovery
 from google.oauth2 import service_account
 # To connect to the google sheet with all the characters
@@ -54,14 +55,25 @@ class Base:
 
     def get_summary(self):
         return self.flavor
+    
+    def get_properties(self):
+        return self.target
 
-    def display_options(self):
+    def display_options(self, to_display=[]):
         if self.options:
             user_done = False
             while not user_done:
-                for i, option in enumerate(self.options):
-                    option = Base(option, self.admin).get_type()
-                    print(f'{i+1}) {option.get_summary()}')
+                options = [Base(option, self.admin).get_type() for option in self.options]
+                option_types = set([type(opt) for opt in options])
+                for option_type in option_types:
+                    table = []
+                    typed_options = [o for o in options if type(o) == option_type]
+                    for i, option in enumerate(typed_options):
+                        table.append([i+1]+[option.get_properties()[p] for p in option.get_display_fields().keys()])
+                    print(typed_options[0].get_type_name())
+                    headers = ['Item #']
+                    headers+=[h for h in typed_options[0].get_display_fields().values()]
+                    print(tabulate(table, headers=headers))
                 print('Or q to quit')
                 choice = click.prompt('')
                 if choice == 'q':
@@ -84,6 +96,8 @@ class Base:
             return Info(self.target, self.admin)
         elif self.type == 'item':
             return Item(self.target, self.admin)
+        elif self.type == "weapon":
+            return Weapon(self.target, self.admin)
 
 
 class Store(Base):
@@ -113,6 +127,9 @@ class Item(Base):
     """
     Item a player can buy at a store
     """
+    def get_type_name(self):
+        return "Items"
+
     def display(self):
         # import pdb; pdb.set_trace()
         self.checkout()
@@ -124,8 +141,8 @@ class Item(Base):
         update_character(character, "money", [balance])
         update_character(character, "gear", [self.flavor, self.cost, self.weight])
 
-    def get_summary(self):
-        return f'{self.flavor}: {self.cost} eb'
+    def get_display_fields(self):
+        return {"flavor":"Name", "cost":"Price (eb)","weight":"Weight (kg)"}
 
     def __init__(self,target, admin):
         super().__init__(target, admin)
@@ -133,6 +150,15 @@ class Item(Base):
         self.weight = target['weight']
         pass
 
+class Weapon(Item):
+    def get_type_name(self):
+        return "Weapons"
+    def __init__(self, target, admin):
+        super().__init__(target, admin)
+    def get_display_fields(self):
+        fields = super().get_display_fields()
+        fields.update({'damage':'Damage'})
+        return fields
 
 def query_character(character, property):
     with open('sheet_map.json') as sheet_map:
@@ -172,7 +198,6 @@ def update_character(character, property, value):
             valueInputOption='USER_ENTERED', 
             body=body
         ).execute()
-    print(f'{character} has {query_character(character, property)[0][0]} {property}')
 
 
 if __name__ == '__main__':

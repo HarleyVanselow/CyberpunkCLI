@@ -16,6 +16,13 @@
             "flavor":"Cheetos",
             "cost":50,
             "weight":0.3
+        },
+        {
+            "type":"weapon",
+            "flavor":"Katana",
+            "cost":200,
+            "weight":2,
+            "damage":4
         }
     ]
 }
