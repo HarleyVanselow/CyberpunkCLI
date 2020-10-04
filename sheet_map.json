@@ -1,3 +1,5 @@
 {
-    "money":"H3"
+    "money":"H3",
+    "gear":"F55:F75",
+    "range_list":["gear", "weapon"]
 }

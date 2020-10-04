@@ -5,6 +5,7 @@ from googleapiclient.discovery import build
 import click
 import httplib2
 import os
+import getpass
 
 from apiclient import discovery
 from google.oauth2 import service_account
@@ -23,7 +24,9 @@ def route():
 @click.argument('character')
 @click.argument('property')
 def qc(character, property):
-    print(f'{character} has {query_character(character, property)} {property}')
+    results = query_character(character, property)
+    for result in results:
+        print(f'{character} has {result[0]} {property}')
 
 @route.command()
 @click.argument('character')
@@ -111,13 +114,15 @@ class Item(Base):
     Item a player can buy at a store
     """
     def display(self):
+        # import pdb; pdb.set_trace()
         self.checkout()
         print(f"{self.cost} eb has been deducted. Enjoy your {self.flavor}")
 
     def checkout(self):
-        character = os.system('whoami')
-        property = 'money'
-        update_character(character, property, SERVICE)
+        character = getpass.getuser()
+        balance = int(query_character(character, "money")[0][0]) - int(self.cost)
+        update_character(character, "money", [balance])
+        update_character(character, "gear", [self.flavor, self.cost, self.weight])
 
     def get_summary(self):
         return f'{self.flavor}: {self.cost} eb'
@@ -125,6 +130,7 @@ class Item(Base):
     def __init__(self,target, admin):
         super().__init__(target, admin)
         self.cost = target['cost']
+        self.weight = target['weight']
         pass
 
 
@@ -135,14 +141,24 @@ def query_character(character, property):
         sheet = SERVICE.spreadsheets()
         result = sheet.values().get(spreadsheetId=SHEET_ID,
                                     range=f'{character}!{query}').execute()
-        return result['values'][0][0]
+        return result['values']
 
 
 def update_character(character, property, value):
     with open('sheet_map.json') as sheet_map:
         cell_map = json.load(sheet_map)
+        range_list = cell_map["range_list"]
+
         query = cell_map[property]
-        body = {'values': [[value]]}
+        if property in range_list:
+            # First find next empty row 
+            existing = query_character(character, property)
+            starting_cell = query.split(":")[0]
+            starting_col = starting_cell[:1]
+            starting_row = starting_cell[1:]
+            query = starting_col + str(int(starting_row) + len(existing))
+
+        body = {'values': [value]}
         sheet = SERVICE.spreadsheets()
         result = sheet.values().update(
             spreadsheetId=SHEET_ID, 
@@ -150,7 +166,6 @@ def update_character(character, property, value):
             valueInputOption='USER_ENTERED', 
             body=body
         ).execute()
-    print('{0} cells updated.'.format(result.get('updatedCells')))
     print(f'{character} has {query_character(character, property)} {property}')
 
 
