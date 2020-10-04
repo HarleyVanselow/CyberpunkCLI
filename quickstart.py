@@ -150,15 +150,27 @@ class Item(Base):
         self.weight = target['weight']
         pass
 
+
+class Gear(Item):
+    def __init__(self, )
+
+    def get_type_name(self):
+        return "Gear"
+
+    
+
 class Weapon(Item):
     def get_type_name(self):
         return "Weapons"
+
     def __init__(self, target, admin):
         super().__init__(target, admin)
+
     def get_display_fields(self):
         fields = super().get_display_fields()
         fields.update({'damage':'Damage'})
         return fields
+
 
 def query_character(character, property):
     with open('sheet_map.json') as sheet_map:
