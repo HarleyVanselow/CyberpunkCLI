@@ -1,0 +1,4 @@
+colorama
+google-api-python-client
+click
+tabulate

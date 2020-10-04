@@ -7,6 +7,7 @@ import httplib2
 import os
 import getpass
 
+from colorama import Fore, Back, Style
 from tabulate import tabulate
 from apiclient import discovery
 from google.oauth2 import service_account
@@ -29,6 +30,7 @@ def qc(character, property):
     for result in results:
         print(f'{character} has {result[0]} {property}')
 
+
 @route.command()
 @click.argument('character')
 @click.argument('property')
@@ -36,26 +38,39 @@ def qc(character, property):
 def uc(character, property, value):
     update_character(character, property, [value])
 
+
 @route.command()
 @click.argument('target')
 @click.option('--auth', default=None)
 def connect(target, auth):
     with open(f'./flavor_text/{target}.json') as target:
         target = json.load(target)
-        admin = 'access_code' in target.keys() and auth == target['access_code']
+        admin = 'access_code' in target.keys(
+        ) and auth == target['access_code']
         Base(target, admin).get_type().display()
 
 
 class Base:
+    def _color_replace(self, input):
+        color_map = {
+            "g": Fore.GREEN,
+            "r": Fore.RED,
+            "b": Fore.BLUE,
+            "/": Style.RESET_ALL
+        }
+        for k, v in color_map.items():
+            input = input.replace(f'<{k}>', v)
+        return input
+
     def display(self):
         if self.admin_flavor != '' and self.admin:
-            print(self.admin_flavor)
+            print(self._color_replace(self.admin_flavor))
         else:
-            print(self.flavor)
+            print(self._color_replace(self.flavor))
 
     def get_summary(self):
         return self.flavor
-    
+
     def get_properties(self):
         return self.target
 
@@ -63,22 +78,29 @@ class Base:
         if self.options:
             user_done = False
             while not user_done:
-                options = [Base(option, self.admin).get_type() for option in self.options]
-                option_types = set([type(opt) for opt in options])
-                for option_type in option_types:
-                    table = []
-                    typed_options = [o for o in options if type(o) == option_type]
-                    for i, option in enumerate(typed_options):
-                        table.append([i+1]+[option.get_properties()[p] for p in option.get_display_fields().keys()])
-                    print(typed_options[0].get_type_name())
-                    headers = ['Item #']
-                    headers+=[h for h in typed_options[0].get_display_fields().values()]
-                    print(tabulate(table, headers=headers))
+                options = [Base(option, self.admin).get_type()
+                           for option in self.options]
+                tables = {}
+                headers = ['Item #']
+                for i, option in enumerate(options):
+                    typed_table = tables.setdefault(
+                        option.get_type_name(), {})
+                    if 'headers' not in typed_table.keys():
+                        typed_table['headers'] = headers + \
+                            [h for h in option.get_display_fields().values()]
+                    typed_table.setdefault('table', []).append(
+                        [i+1]+[option.get_properties()[p] for p in option.get_display_fields().keys()])
+                for item_type in tables.keys():
+                    print(item_type)
+                    print(tabulate(tables[item_type]['table'],
+                                   headers=tables[item_type]['headers']))
+
                 print('Or q to quit')
                 choice = click.prompt('')
                 if choice == 'q':
                     return
-                Base(self.options[int(choice)-1], self.admin).get_type().display()
+                Base(self.options[int(choice)-1],
+                     self.admin).get_type().display()
                 user_done = click.confirm('Exit?')
 
     def __init__(self, target, admin):
@@ -106,7 +128,7 @@ class Store(Base):
         super().display_options()
 
     def __init__(self, target, admin):
-        super().__init__(target,admin)
+        super().__init__(target, admin)
         self.money = target['money']
 
 
@@ -119,7 +141,7 @@ class Info(Base):
         return self.header
 
     def __init__(self, target, admin):
-        super().__init__(target,admin)
+        super().__init__(target, admin)
         self.header = target.get('header', target['flavor'])
 
 
@@ -127,6 +149,7 @@ class Item(Base):
     """
     Item a player can buy at a store
     """
+
     def get_type_name(self):
         return "Items"
 
@@ -137,14 +160,16 @@ class Item(Base):
 
     def checkout(self):
         character = getpass.getuser()
-        balance = int(query_character(character, "money")[0][0]) - int(self.cost)
+        balance = int(query_character(character, "money")
+                      [0][0]) - int(self.cost)
         update_character(character, "money", [balance])
-        update_character(character, "gear", [self.flavor, self.cost, self.weight])
+        update_character(character, "gear", [
+                         self.flavor, self.cost, self.weight])
 
     def get_display_fields(self):
-        return {"flavor":"Name", "cost":"Price (eb)","weight":"Weight (kg)"}
+        return {"flavor": "Name", "cost": "Price (eb)", "weight": "Weight (kg)"}
 
-    def __init__(self,target, admin):
+    def __init__(self, target, admin):
         super().__init__(target, admin)
         self.cost = target['cost']
         self.weight = target['weight']
@@ -168,7 +193,7 @@ class Weapon(Item):
 
     def get_display_fields(self):
         fields = super().get_display_fields()
-        fields.update({'damage':'Damage'})
+        fields.update({'damage': 'Damage'})
         return fields
 
 
@@ -189,7 +214,7 @@ def update_character(character, property, value):
 
         query = cell_map[property]
         if property in range_list:
-            # First find next empty row 
+            # First find next empty row
             existing = query_character(character, property)
             starting_cell = query.split(":")[0]
             starting_col = starting_cell[:1]
@@ -205,9 +230,9 @@ def update_character(character, property, value):
         body = {'values': [value]}
         sheet = SERVICE.spreadsheets()
         sheet.values().update(
-            spreadsheetId=SHEET_ID, 
+            spreadsheetId=SHEET_ID,
             range=f'{character}!{query}',
-            valueInputOption='USER_ENTERED', 
+            valueInputOption='USER_ENTERED',
             body=body
         ).execute()
 
@@ -222,7 +247,8 @@ if __name__ == '__main__':
     try:
         scopes = ["https://www.googleapis.com/auth/spreadsheets"]
         secret_file = os.path.join(os.getcwd(), 'client_secret.json')
-        credentials = service_account.Credentials.from_service_account_file(secret_file, scopes=scopes)
+        credentials = service_account.Credentials.from_service_account_file(
+            secret_file, scopes=scopes)
         SERVICE = discovery.build('sheets', 'v4', credentials=credentials)
     except Exception as e:
         print(e)
