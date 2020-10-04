@@ -157,6 +157,12 @@ def update_character(character, property, value):
             starting_col = starting_cell[:1]
             starting_row = starting_cell[1:]
             query = starting_col + str(int(starting_row) + len(existing))
+            i = 0
+            while i < len(existing):
+                if existing[i] == []:
+                    query = starting_col + str(int(starting_row) + i)
+                    break
+                i += 1
 
         body = {'values': [value]}
         sheet = SERVICE.spreadsheets()
