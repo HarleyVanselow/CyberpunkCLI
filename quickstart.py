@@ -110,6 +110,7 @@ class Base:
         self.admin_flavor = target.get('admin_flavor', '')
         self.options = target.get('options', [])
         self.admin = admin
+        self.character = getpass.getuser()
 
     def get_type(self):
         if self.type == 'store':
@@ -120,6 +121,8 @@ class Base:
             return Item(self.target, self.admin)
         elif self.type == "weapon":
             return Weapon(self.target, self.admin)
+        elif self.type == 'gear':
+            return Gear(self.target, self.admin)
 
 
 class Store(Base):
@@ -154,39 +157,48 @@ class Item(Base):
         return "Items"
 
     def display(self):
-        # import pdb; pdb.set_trace()
         self.checkout()
 
     def checkout(self):
-        character = getpass.getuser()
-        balance = int(query_character(character, "money")
+        balance = int(query_character(self.character, "money")
                       [0][0]) 
         cost = int(self.cost)
         if balance < cost:
             print("Insufficient funds: Come back when you get some money, buddy!")
         else:
             balance -= cost
-            update_character(character, "money", [balance])
-            update_character(character, "gear", [
-                            self.flavor, self.cost, self.weight])
+            update_character(self.character, "money", [balance])
             print(f"{self.cost} eb has been deducted. Enjoy your {self.flavor}")
+            self.checkout_update()
+
+    def checkout_update(self):
+        raise NotImplementedError
 
     def get_display_fields(self):
-        return {"flavor": "Name", "cost": "Price (eb)", "weight": "Weight (kg)"}
+        return {"flavor": "Name", "cost": "Price (eb/unit)"}
 
     def __init__(self, target, admin):
         super().__init__(target, admin)
         self.cost = target['cost']
-        self.weight = target['weight']
         pass
 
 
-# class Gear(Item):
-#     def __init__(self, )
+class Gear(Item):
+    def __init__(self, target, admin):
+        super().__init__(target, admin)
+        self.weight = target['weight']
 
-#     def get_type_name(self):
-#         return "Gear"
+    def get_type_name(self):
+        return "Gear"
 
+    def get_display_fields(self):
+        fields = super().get_display_fields()
+        fields.update({"weight": "Weight (kg)"})
+        return fields
+
+    def checkout_update(self):
+        update_character(self.character, "gear", [
+                self.flavor, self.cost, self.weight])
     
 
 class Weapon(Item):
@@ -195,11 +207,38 @@ class Weapon(Item):
 
     def __init__(self, target, admin):
         super().__init__(target, admin)
+        self.weapon_type = target['weapon_type']
+        self.accuracy = target['accuracy']
+        self.con = target['concealability']
+        self.avail = target['availability']
+        self.damage_ammo = target['damage/ammunition']
+        self.num_shots = target['num_shots']
+        self.rof = target['rate_of_fire']
+        self.rel = target['reliability']
+        self.range = target['range']
 
     def get_display_fields(self):
         fields = super().get_display_fields()
-        fields.update({'damage': 'Damage'})
+        fields.update({
+            'weapon_type': 'Type',
+            "accuracy":"Accuracy",
+            "concealability":"Concealability",
+            "availability":"Availability",
+            "damage/ammunition":"Damage/Ammo",
+            "num_shots":"#Shots",
+            "rate_of_fire":"Rate of Fire",
+            "reliability":"Reliability",
+            "range":"Range"
+        })
         return fields
+        
+
+    def checkout_update(self):
+        update_character(self.character, "weapon", [
+                self.flavor, self.weapon_type, self.accuracy, self.con, 
+                self.avail, self.damage_ammo, self.num_shots, self.rof,
+                self.rel, self.range
+        ])
 
 
 def query_character(character, property):
@@ -209,7 +248,10 @@ def query_character(character, property):
         sheet = SERVICE.spreadsheets()
         result = sheet.values().get(spreadsheetId=SHEET_ID,
                                     range=f'{character}!{query}').execute()
-        return result['values']
+        if 'values' in result:
+            return result['values']
+        else:
+            return None
 
 
 def update_character(character, property, value):
@@ -222,15 +264,18 @@ def update_character(character, property, value):
             # First find next empty row
             existing = query_character(character, property)
             starting_cell = query.split(":")[0]
-            starting_col = starting_cell[:1]
-            starting_row = starting_cell[1:]
-            query = starting_col + str(int(starting_row) + len(existing))
-            i = 0
-            while i < len(existing):
-                if existing[i] == []:
-                    query = starting_col + str(int(starting_row) + i)
-                    break
-                i += 1
+            if existing is None:
+                query = starting_cell
+            else:
+                starting_col = starting_cell[:1]
+                starting_row = starting_cell[1:]
+                query = starting_col + str(int(starting_row) + len(existing))
+                i = 0
+                while i < len(existing):
+                    if existing[i] == []:
+                        query = starting_col + str(int(starting_row) + i)
+                        break
+                    i += 1
 
         body = {'values': [value]}
         sheet = SERVICE.spreadsheets()

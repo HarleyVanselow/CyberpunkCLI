@@ -1,28 +1,35 @@
 {
     "type": "store",
-    "flavor": "Welcome to <b>Weyland Yutani Refreshements</>, please select a purchase",
+    "flavor": "Welcome to <g>Weyland Yutani Refreshements</>, please select a purchase",
     "admin_flavor": "REGISTERED CONNECTION: STORE OWNER",
     "access_code": "prometheus",
     "money":200,
     "options":[
         {
-            "type":"item",
+            "type":"gear",
             "flavor":"Pepsi",
             "cost":50,
             "weight":0.5
         },
         {
-            "type":"item",
+            "type":"gear",
             "flavor":"Cheetos",
             "cost":50,
             "weight":0.3
         },
         {
             "type":"weapon",
-            "flavor":"Katana",
-            "cost":200,
-            "weight":2,
-            "damage":4
+            "flavor":"C-6",
+            "weapon_type":"HVY",
+            "accuracy":0,
+            "concealability":"P",
+            "availability":"P",
+            "damage/ammunition":"8D10 per kg",
+            "num_shots":1,
+            "rate_of_fire":1,
+            "reliability":"VR",
+            "range":"-1",
+            "cost":100
         }
     ]
 }

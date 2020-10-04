@@ -1,5 +1,6 @@
 {
     "money":"H3",
     "gear":"F55:F75",
+    "weapon":"J55:J75",
     "range_list":["gear", "weapon"]
 }
