@@ -33,7 +33,7 @@ def qc(character, property):
 @click.argument('property')
 @click.argument('value')
 def uc(character, property, value):
-    update_character(character, property, value)
+    update_character(character, property, [value])
 
 @route.command()
 @click.argument('target')
@@ -166,17 +166,20 @@ def update_character(character, property, value):
 
         body = {'values': [value]}
         sheet = SERVICE.spreadsheets()
-        result = sheet.values().update(
+        sheet.values().update(
             spreadsheetId=SHEET_ID, 
             range=f'{character}!{query}',
             valueInputOption='USER_ENTERED', 
             body=body
         ).execute()
-    print(f'{character} has {query_character(character, property)} {property}')
+    print(f'{character} has {query_character(character, property)[0][0]} {property}')
 
 
 if __name__ == '__main__':
-    with open('./credentials.json') as creds:
+    abspath = os.path.abspath(__file__)
+    dname = os.path.dirname(abspath)
+    os.chdir(dname)
+    with open('credentials.json') as creds:
         creds = json.load(creds)
         SHEET_ID = creds['sheet_id']
     try:
