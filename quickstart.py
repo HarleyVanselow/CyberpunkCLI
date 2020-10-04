@@ -11,7 +11,7 @@ from google.oauth2 import service_account
 # To connect to the google sheet with all the characters
 API_KEY = ''
 SHEET_ID = ''
-SERVICE = ''
+SERVICE = None
 
 
 @click.group()
@@ -157,13 +157,12 @@ def update_character(character, property, value):
 if __name__ == '__main__':
     with open('./credentials.json') as creds:
         creds = json.load(creds)
-        API_KEY = creds['api_key']
         SHEET_ID = creds['sheet_id']
-        try:
-            scopes = ["https://www.googleapis.com/auth/drive", "https://www.googleapis.com/auth/drive.file", "https://www.googleapis.com/auth/spreadsheets"]
-            secret_file = os.path.join(os.getcwd(), 'client_secret.json')
-            credentials = service_account.Credentials.from_service_account_file(secret_file, scopes=scopes)
-            SERVICE = discovery.build('sheets', 'v4', credentials=credentials)
-        except Exception as e:
-            print(e)
+    try:
+        scopes = ["https://www.googleapis.com/auth/spreadsheets"]
+        secret_file = os.path.join(os.getcwd(), 'client_secret.json')
+        credentials = service_account.Credentials.from_service_account_file(secret_file, scopes=scopes)
+        SERVICE = discovery.build('sheets', 'v4', credentials=credentials)
+    except Exception as e:
+        print(e)
     route()
