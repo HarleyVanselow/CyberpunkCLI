@@ -3,7 +3,11 @@ from __future__ import print_function
 import json
 from googleapiclient.discovery import build
 import click
+import httplib2
+import os
 
+from apiclient import discovery
+from google.oauth2 import service_account
 # To connect to the google sheet with all the characters
 API_KEY = ''
 SHEET_ID = ''
@@ -138,7 +142,7 @@ def update_character(character, property, value):
     with open('sheet_map.json') as sheet_map:
         cell_map = json.load(sheet_map)
         query = cell_map[property]
-        body = {'values': value}
+        body = {'values': [[value]]}
         sheet = SERVICE.spreadsheets()
         result = sheet.values().update(
             spreadsheetId=SHEET_ID, 
@@ -155,5 +159,11 @@ if __name__ == '__main__':
         creds = json.load(creds)
         API_KEY = creds['api_key']
         SHEET_ID = creds['sheet_id']
-        SERVICE = build('sheets', 'v4', developerKey=API_KEY)
+        try:
+            scopes = ["https://www.googleapis.com/auth/drive", "https://www.googleapis.com/auth/drive.file", "https://www.googleapis.com/auth/spreadsheets"]
+            secret_file = os.path.join(os.getcwd(), 'client_secret.json')
+            credentials = service_account.Credentials.from_service_account_file(secret_file, scopes=scopes)
+            SERVICE = discovery.build('sheets', 'v4', credentials=credentials)
+        except Exception as e:
+            print(e)
     route()
