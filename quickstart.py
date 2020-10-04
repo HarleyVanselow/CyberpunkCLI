@@ -64,16 +64,19 @@ class Base:
             user_done = False
             while not user_done:
                 options = [Base(option, self.admin).get_type() for option in self.options]
-                option_types = set([type(opt) for opt in options])
-                for option_type in option_types:
-                    table = []
-                    typed_options = [o for o in options if type(o) == option_type]
-                    for i, option in enumerate(typed_options):
-                        table.append([i+1]+[option.get_properties()[p] for p in option.get_display_fields().keys()])
-                    print(typed_options[0].get_type_name())
-                    headers = ['Item #']
-                    headers+=[h for h in typed_options[0].get_display_fields().values()]
-                    print(tabulate(table, headers=headers))
+                tables = {}
+                headers = ['Item #']
+                for i, option in enumerate(options):
+                    typed_table = tables.setdefault(
+                        option.get_type_name()
+                    ,{})
+                    if 'headers' not in typed_table.keys():
+                        typed_table['headers']=headers+[h for h in option.get_display_fields().values()]
+                    typed_table.setdefault('table',[]).append([i+1]+[option.get_properties()[p] for p in option.get_display_fields().keys()])
+                for item_type in tables.keys():
+                    print(item_type)
+                    print(tabulate(tables[item_type]['table'], headers=tables[item_type]['headers']))
+                    
                 print('Or q to quit')
                 choice = click.prompt('')
                 if choice == 'q':
