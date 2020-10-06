@@ -2,5 +2,18 @@
     "money":"H3",
     "gear":"F55:F75",
     "weapon":"J55:J75",
-    "range_list":["gear", "weapon"]
+    "cybernetics":"I20:I45",
+    "int":"B7",
+    "attr":"B8",
+    "emp":"B9",
+    "ref":"D7",
+    "luck":"D8",
+    "tech":"F7",
+    "ma":"F8",
+    "humanity":"G3",
+    "ip":"F3",
+    "save":"B14",
+    "btm":"B15",
+    "skills":"A20:H51",
+    "range_list":["gear", "weapon", "cybernetics"]
 }

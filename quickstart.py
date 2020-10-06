@@ -6,6 +6,7 @@ import click
 import httplib2
 import os
 import getpass
+import random
 
 from colorama import Fore, Back, Style
 from tabulate import tabulate
@@ -26,9 +27,9 @@ def route():
 @click.argument('character')
 @click.argument('property')
 def qc(character, property):
-    results = query_character(character, property)
+    results = query_character(character, property)[1]
     for result in results:
-        print(f'{character} has {result[0]} {property}')
+        print(f'{character} has {result} {property}')
 
 
 @route.command()
@@ -48,6 +49,24 @@ def connect(target, auth):
         admin = 'access_code' in target.keys(
         ) and auth == target['access_code']
         Base(target, admin).get_type().display()
+
+
+@route.command()
+@click.argument('stat')
+@click.option('--D', default=10, type=click.INT)
+@click.option('--skill', default='')
+def roll(stat, d, skill):
+    result = random.randrange(1, d+1)
+    character = getpass.getuser()
+    stat_modifier = query_character(character, stat)[1]
+    skill_notification = ']'
+    skill_modifier = 0
+    if skill:
+        skill_modifier = query_character(character, skill)[1]
+        skill_notification = f' + {skill_modifier} ({skill})]'
+    total = int(result) + int(stat_modifier) + int(skill_modifier)
+    os.system(
+        f'wall "{character} rolled a {Fore.GREEN}{total}!{Style.RESET_ALL} [{result} (roll) + {stat_modifier} ({stat}){skill_notification}"')
 
 
 class Base:
@@ -161,7 +180,7 @@ class Item(Base):
 
     def checkout(self):
         balance = int(query_character(self.character, "money")
-                      [0][0]) 
+                      [0][0])[1]
         cost = int(self.cost)
         if balance < cost:
             print("Insufficient funds: Come back when you get some money, buddy!")
@@ -198,8 +217,8 @@ class Gear(Item):
 
     def checkout_update(self):
         update_character(self.character, "gear", [
-                self.flavor, self.cost, self.weight])
-    
+            self.flavor, self.cost, self.weight])
+
 
 class Weapon(Item):
     def get_type_name(self):
@@ -221,35 +240,58 @@ class Weapon(Item):
         fields = super().get_display_fields()
         fields.update({
             'weapon_type': 'Type',
-            "accuracy":"Accuracy",
-            "concealability":"Concealability",
-            "availability":"Availability",
-            "damage/ammunition":"Damage/Ammo",
-            "num_shots":"#Shots",
-            "rate_of_fire":"Rate of Fire",
-            "reliability":"Reliability",
-            "range":"Range"
+            "accuracy": "Accuracy",
+            "concealability": "Concealability",
+            "availability": "Availability",
+            "damage/ammunition": "Damage/Ammo",
+            "num_shots": "#Shots",
+            "rate_of_fire": "Rate of Fire",
+            "reliability": "Reliability",
+            "range": "Range"
         })
         return fields
-        
 
     def checkout_update(self):
         update_character(self.character, "weapon", [
-                self.flavor, self.weapon_type, self.accuracy, self.con, 
-                self.avail, self.damage_ammo, self.num_shots, self.rof,
-                self.rel, self.range
+            self.flavor, self.weapon_type, self.accuracy, self.con,
+            self.avail, self.damage_ammo, self.num_shots, self.rof,
+            self.rel, self.range
         ])
+
+
+def find_skill(skill_table, skill, starting_cell):
+    skill_row = 0
+    skill_col = 0
+    for y, row in enumerate(skill_table):
+        lowered = [i.lower() for i in row]
+        if skill.lower() in lowered:
+            skill_row = y
+            skill_col = lowered.index(skill.lower())+1
+    start_col = starting_cell[0]
+    start_row = int(starting_cell[1:])
+    cell = f'{chr(ord(start_col)+skill_col)}{start_row+skill_row}'
+    val = skill_table[skill_row][skill_col] if len(
+        skill_table[skill_row]) > skill_col else 0
+    return (cell, val)
 
 
 def query_character(character, property):
     with open('sheet_map.json') as sheet_map:
         cell_map = json.load(sheet_map)
-        query = cell_map[property]
+        is_skill = property.lower() not in cell_map.keys()
+        if is_skill:
+            # assume its a skill
+            query = cell_map['skills']
+        else:
+            query = cell_map[property.lower()]
         sheet = SERVICE.spreadsheets()
         result = sheet.values().get(spreadsheetId=SHEET_ID,
                                     range=f'{character}!{query}').execute()
         if 'values' in result:
-            return result['values']
+            return_val = result['values']
+            if len(return_val) == 1 and len(return_val[0]) == 1:
+                return_val = result['values'][0][0]
+            return find_skill(result['values'], property, query.split(':')[0]) if is_skill else (query, return_val)
         else:
             return None
 
@@ -258,11 +300,14 @@ def update_character(character, property, value):
     with open('sheet_map.json') as sheet_map:
         cell_map = json.load(sheet_map)
         range_list = cell_map["range_list"]
-
-        query = cell_map[property]
+        is_skill = property.lower() not in cell_map.keys()
+        if is_skill:
+            query, skill_value = query_character(character, property)
+        else:
+            query = cell_map[property]
         if property in range_list:
             # First find next empty row
-            existing = query_character(character, property)
+            (query, existing) = query_character(character, property)
             starting_cell = query.split(":")[0]
             if existing is None:
                 query = starting_cell
