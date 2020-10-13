@@ -99,21 +99,24 @@ class Base:
             while not user_done:
                 options = [Base(option, self.admin).get_type()
                            for option in self.options]
-                tables = {}
-                headers = ['Item #']
-                for i, option in enumerate(options):
-                    typed_table = tables.setdefault(
-                        option.get_type_name(), {})
-                    if 'headers' not in typed_table.keys():
-                        typed_table['headers'] = headers + \
-                            [h for h in option.get_display_fields().values()]
-                    typed_table.setdefault('table', []).append(
-                        [i+1]+[option.get_properties()[p] for p in option.get_display_fields().keys()])
-                for item_type in tables.keys():
-                    print(item_type)
-                    print(tabulate(tables[item_type]['table'],
-                                   headers=tables[item_type]['headers']))
-
+                if isinstance(options[0], Item):
+                    tables = {}
+                    headers = ['Item #']
+                    for i, option in enumerate(options):
+                        typed_table = tables.setdefault(
+                            option.get_type_name(), {})
+                        if 'headers' not in typed_table.keys():
+                            typed_table['headers'] = headers + \
+                                [h for h in option.get_display_fields().values()]
+                        typed_table.setdefault('table', []).append(
+                            [i+1]+[option.get_properties()[p] for p in option.get_display_fields().keys()])
+                    for item_type in tables.keys():
+                        print(item_type)
+                        print(tabulate(tables[item_type]['table'],
+                                    headers=tables[item_type]['headers']))
+                elif isinstance(options[0], Info):
+                    for i, option in enumerate(options):
+                        print(f"{i+1}) {option.get_summary()}")
                 print('Or q to quit')
                 choice = click.prompt('')
                 if choice == 'q':
