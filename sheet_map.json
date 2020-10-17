@@ -15,5 +15,15 @@
     "save":"B14",
     "btm":"B15",
     "skills":"A20:H51",
+    "loc_1":"B12",
+    "loc_2":"C12",
+    "loc_3":"C12",
+    "loc_4":"C12",
+    "loc_5":"D12",
+    "loc_6":"E12",
+    "loc_7":"F12",
+    "loc_8":"F12",
+    "loc_9":"G12",
+    "loc_10":"G12",
     "range_list":["gear", "weapon", "cybernetics"]
 }

@@ -24,7 +24,7 @@
             "accuracy":0,
             "concealability":"P",
             "availability":"P",
-            "damage/ammunition":"8D10 per kg",
+            "damage/ammunition":"8D10",
             "num_shots":1,
             "rate_of_fire":1,
             "reliability":"VR",

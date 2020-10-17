@@ -12,7 +12,6 @@ from src.displayclasses import Base
 from src.sheetio import query_character, update_character
 from colorama import Fore, Back, Style
 
-
 @click.group()
 def route():
     pass
@@ -46,26 +45,66 @@ def connect(target, auth):
         Base(target, admin).get_type().display()
 
 
-@route.command()
+@route.group()
+def roll():
+    pass
+
+@roll.command()
 @click.option('--stat', default=None)
 @click.option('--D', default=10, type=click.INT)
 @click.option('--skill', default='')
-@click.option('--action', default=None)
-def roll(stat, d, skill, action):
-    if action is None:
-        msg = base_roll(stat, d, skill)
-    elif action == 'facedown':
-        print('This is a facedown!')
-    elif action == 'initiative':
-        msg = 'Rolling for initiative: ' + base_roll('REF', d, None) + '\n'
-        msg += 'Special case: if a QUICK DRAW is declared, add 3 to intiative roll' \
-            ' and take 3 extra damage in the current combat round.'
-    elif action == 'attack':
-        pass
-    elif action == 'save':
-        msg = "Rolling for save: "
+def skillcheck(stat, d, skill):
+    msg = base_roll(stat, d, skill)
     print(msg)
     os.system(f'wall "{msg}"')
+
+@roll.command()
+def facedown():
+    print('This is the final facedown!')
+
+@roll.command()
+def initiative():
+    msg = 'Rolling for initiative: ' + base_roll('REF', 10, None) + '\n'
+    msg += 'Special case: if a QUICK DRAW is declared, add 3 to intiative roll' \
+        ' and take 3 extra damage in the current combat round.'
+    print(msg)
+    os.system(f'wall "{msg}"')
+
+
+@roll.command()
+@click.argument('is_called') 
+@click.argument('weapon')
+@click.argument('opponent')
+def attack(is_called, weapon_name, opponent):
+    """
+    :param is_called: If an attack is called, it aims at a specific 
+        part of the opponent's body but the attacker takes -4 penalty 
+        in attack damage. Allowed values: True or False.
+    :param weapon: Pick a weapon from your inventory to use in the 
+        current combat round. Allowed values: Names of weapons you own.
+    :param opponent: Name of the person you are fighting against.
+    """
+    #TODO: Make the docstring keep its formatting when 
+    # printed with --help
+    # Get weapon stats
+    weapon = get_weapon(weapon_name) #TODO: Implement get_weapon()
+
+    for i in range(weapon.rof):
+        # Roll for hit location
+        loc = random.randrange(1, 11)
+
+        # Get opponent's SP based on location
+
+        # Get opponent's body type
+
+        # Compute final damage on opponent
+
+        # Update opponent's wounds
+
+
+@roll.command()
+def save():
+    pass
 
 
 def base_roll(stat, d, skill):
