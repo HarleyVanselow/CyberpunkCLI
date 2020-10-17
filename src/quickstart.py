@@ -45,10 +45,28 @@ def connect(target, auth):
 
 
 @route.command()
-@click.argument('stat')
+@click.option('--stat', default=None)
 @click.option('--D', default=10, type=click.INT)
 @click.option('--skill', default='')
-def roll(stat, d, skill):
+@click.option('--action', default=None)
+def roll(stat, d, skill, action):
+    if action is None:
+        msg = base_roll(stat, d, skill)
+    elif action == 'facedown':
+        print('This is a facedown!')
+    elif action == 'initiative':
+        msg = 'Rolling for initiative: ' + base_roll('REF', d, None) +'\n'
+        msg +=  'Special case: if a QUICK DRAW is declared, add 3 to intiative roll' \
+            ' and take 3 extra damage in the current combat round.'
+    elif action == 'attack':
+        pass
+    elif action == 'save':
+        msg = "Rolling for save: "
+    print(msg)
+    os.system(f'wall "{msg}"')
+
+
+def base_roll(stat, d, skill):
     result = random.randrange(1, d+1)
     character = getpass.getuser()
     stat_modifier = query_character(character, stat)[1]
@@ -60,8 +78,7 @@ def roll(stat, d, skill):
         skill_notification = f' + {skill_modifier} ({skill})]'
     total = int(result) + int(stat_modifier) + int(skill_modifier)
     message = f"{character} rolled a {Fore.GREEN}{total}!{Style.RESET_ALL} [{result} (roll) + {stat_modifier} ({stat}){skill_notification}"
-    print(message)
-    os.system(f'wall "{message}"')
+    return message
 
 
 class Base:
