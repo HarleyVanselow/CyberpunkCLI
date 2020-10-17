@@ -293,6 +293,7 @@ def query_character(character, property):
             query = cell_map['skills']
         else:
             query = cell_map[property.lower()]
+        # pylint: disable=maybe-no-member
         sheet = SERVICE.spreadsheets()
         result = sheet.values().get(spreadsheetId=SHEET_ID,
                                     range=f'{character}!{query}').execute()
@@ -332,6 +333,7 @@ def update_character(character, property, value):
                     i += 1
 
         body = {'values': [value]}
+        # pylint: disable=maybe-no-member
         sheet = SERVICE.spreadsheets()
         sheet.values().update(
             spreadsheetId=SHEET_ID,
