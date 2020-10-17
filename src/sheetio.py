@@ -55,6 +55,7 @@ def query_character(character, property):
     """
     with open('sheet_map.json') as sheet_map:
         cell_map = json.load(sheet_map)
+        import pdb; pdb.set_trace()
         is_skill = property.lower() not in cell_map.keys()
         if is_skill:
             # assume its a skill

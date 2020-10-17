@@ -90,17 +90,30 @@ def attack(is_called, weapon_name, opponent):
     character = getpass.getuser()
     weapon = get_weapon(character, weapon_name) #TODO: Implement get_weapon()
 
-    for i in range(weapon.rof):
-        # Roll for hit location
-        loc = random.randrange(1, 11)
+    # Roll for hit location
+    loc = random.randrange(1, 11)
 
-        # Get opponent's SP based on location
+    # Get opponent's SP based on location
+    query, sp, name = query_character(opponent, 'loc_'+loc)
 
-        # Get opponent's body type
+    # Get opponent's body type
+    query, btm, name = query_character(opponent, 'btm')
 
-        # Compute final damage on opponent
+    # Roll for damage
+    # Assuming weapon.damage is always in the form of "XDY+Z(mm)"
+    damage_stat = s.split('(')[0]
+    roll, bonus = damage_stat.split('+')
+    bonus = int(bonus)
+    times, d = [int(x) for x in roll.split('D')]
+    damage = bonus
+    for i in range(times):
+        damage += random.randrange(1, d+1)
 
-        # Update opponent's wounds
+    # Compute final damage on opponent
+    damage = damage - sp - btm
+
+    # Update opponent's wounds
+    
 
 
 @roll.command()
