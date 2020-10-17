@@ -75,7 +75,7 @@ def base_roll(stat, d, skill):
     skill_notification = ']'
     skill_modifier = 0
     if skill:
-        query, skill_modifier, skill = query_character(character, skill)
+        _, skill_modifier, skill = query_character(character, skill)
         skill_modifier = 0 if skill_modifier == '' else skill_modifier
         skill_notification = f' + {skill_modifier} ({skill})]'
     total = int(result) + int(stat_modifier) + int(skill_modifier)

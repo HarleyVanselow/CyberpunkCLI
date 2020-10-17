@@ -2,14 +2,16 @@ from src import SERVICE, SHEET_ID
 import json
 
 def find_skill(skill_table, skill, starting_cell):
-    skill_row = 0
-    skill_col = 0
+    skill_row = None
+    skill_col = None
     for y, row in enumerate(skill_table):
         for x, skill_name in enumerate(row):
             if skill in skill_name.lower():
                 skill_row = y
                 skill_col = x+1
                 skill = skill_name
+    if skill_row is None and skill_col is None:
+        return (None, '0', skill)
     start_col = starting_cell[0]
     start_row = int(starting_cell[1:])
     cell = f'{chr(ord(start_col)+skill_col)}{start_row+skill_row}'
@@ -56,7 +58,7 @@ def update_character(character, property, value):
         range_list = cell_map["range_list"]
         is_skill = property.lower() not in cell_map.keys()
         if is_skill:
-            query, skill_value, property = query_character(character, property)
+            query, _, property = query_character(character, property)
         else:
             query = cell_map[property]
         if property in range_list:
