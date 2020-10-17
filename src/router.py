@@ -7,11 +7,10 @@ import httplib2
 import os
 import getpass
 import random
-from colorama import Fore, Back, Style
-from tabulate import tabulate
 from src import SERVICE, SHEET_ID
 from src.displayclasses import Base
 from src.sheetio import query_character, update_character
+from colorama import Fore, Back, Style
 
 
 @click.group()

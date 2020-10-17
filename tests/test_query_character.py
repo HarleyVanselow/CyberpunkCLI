@@ -1,4 +1,4 @@
-from src.quickstart import query_character
+from src.router import query_character
 
 
 def test_query_character():
