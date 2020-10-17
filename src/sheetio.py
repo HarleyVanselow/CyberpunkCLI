@@ -1,6 +1,7 @@
 from src import SERVICE, SHEET_ID
 import json
 
+
 def find_skill(skill_table, skill, starting_cell):
     skill_row = None
     skill_col = None
@@ -18,6 +19,27 @@ def find_skill(skill_table, skill, starting_cell):
     val = skill_table[skill_row][skill_col] if len(
         skill_table[skill_row]) > skill_col else 0
     return (cell, val, skill)
+
+
+def get_weapon(character, weapon_name):
+    from src.displayclasses import Base
+    _, weapons, _ = query_character(character, 'weapon')
+    for weapon in weapons:
+        if weapon[0].lower() in weapon_name.lower():
+            return Base({
+                        "type": "weapon",
+                        "flavor": weapon[0],
+                        "weapon_type": weapon[1],
+                        "accuracy": weapon[2],
+                        "concealability": weapon[3],
+                        "availability": weapon[4],
+                        "damage/ammunition": weapon[5],
+                        "num_shots": weapon[6],
+                        "rate_of_fire": weapon[7],
+                        "reliability": weapon[8],
+                        "range": weapon[9],
+                        "cost": None
+                        }, None).get_type()
 
 
 def query_character(character, property):
@@ -45,7 +67,7 @@ def query_character(character, property):
                                     range=f'{character}!{query}').execute()
         if 'values' in result:
             return_val = result['values']
-            if len(return_val) == 1 and len(return_val[0]) == 1:
+            if len(return_val) == 1 and len(return_val[0]) == 1 and ":" not in query:
                 return_val = result['values'][0][0]
             return find_skill(result['values'], property, query.split(':')[0]) if is_skill else (query, return_val, property)
         else:
@@ -63,14 +85,15 @@ def update_character(character, property, value):
             query = cell_map[property]
         if property in range_list:
             # First find next empty row
-            (query, existing, property) = query_character(character, property)
+            existing = query_character(character, property)
             starting_cell = query.split(":")[0]
             if existing is None:
                 query = starting_cell
             else:
                 starting_col = starting_cell[:1]
                 starting_row = starting_cell[1:]
-                query = starting_col + str(int(starting_row) + len(existing))
+                query = starting_col + \
+                    str(int(starting_row) + len(existing[1]))
                 i = 0
                 while i < len(existing):
                     if existing[i] == []:

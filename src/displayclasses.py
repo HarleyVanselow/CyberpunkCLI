@@ -116,8 +116,7 @@ class Item(Base):
         self.checkout()
 
     def checkout(self):
-        balance = int(query_character(self.character, "money")
-                      [0][0])[1]
+        balance = int(query_character(self.character, "money")[1])
         cost = int(self.cost)
         if balance < cost:
             print("Insufficient funds: Come back when you get some money, buddy!")
