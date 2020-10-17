@@ -9,7 +9,7 @@ import getpass
 import random
 from src import SERVICE, SHEET_ID
 from src.displayclasses import Base
-from src.sheetio import query_character, update_character
+from src.sheetio import query_character, update_character, get_weapon
 from colorama import Fore, Back, Style
 
 @click.group()
@@ -87,7 +87,8 @@ def attack(is_called, weapon_name, opponent):
     #TODO: Make the docstring keep its formatting when 
     # printed with --help
     # Get weapon stats
-    weapon = get_weapon(weapon_name) #TODO: Implement get_weapon()
+    character = getpass.getuser()
+    weapon = get_weapon(character, weapon_name) #TODO: Implement get_weapon()
 
     for i in range(weapon.rof):
         # Roll for hit location
