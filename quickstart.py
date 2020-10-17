@@ -62,11 +62,13 @@ def roll(stat, d, skill):
     skill_notification = ']'
     skill_modifier = 0
     if skill:
-        skill_modifier = query_character(character, skill)[1]
+        query, skill_modifier, skill = query_character(character, skill)
+        skill_modifier = 0 if skill_modifier == '' else skill_modifier
         skill_notification = f' + {skill_modifier} ({skill})]'
     total = int(result) + int(stat_modifier) + int(skill_modifier)
-    os.system(
-        f'wall "{character} rolled a {Fore.GREEN}{total}!{Style.RESET_ALL} [{result} (roll) + {stat_modifier} ({stat}){skill_notification}"')
+    message = f"{character} rolled a {Fore.GREEN}{total}!{Style.RESET_ALL} [{result} (roll) + {stat_modifier} ({stat}){skill_notification}"
+    print(message)
+    os.system(f'wall "{message}"')
 
 
 class Base:
@@ -113,7 +115,7 @@ class Base:
                     for item_type in tables.keys():
                         print(item_type)
                         print(tabulate(tables[item_type]['table'],
-                                    headers=tables[item_type]['headers']))
+                                       headers=tables[item_type]['headers']))
                 elif isinstance(options[0], Info):
                     for i, option in enumerate(options):
                         print(f"{i+1}) {option.get_summary()}")
@@ -266,16 +268,17 @@ def find_skill(skill_table, skill, starting_cell):
     skill_row = 0
     skill_col = 0
     for y, row in enumerate(skill_table):
-        lowered = [i.lower() for i in row]
-        if skill.lower() in lowered:
-            skill_row = y
-            skill_col = lowered.index(skill.lower())+1
+        for x, skill_name in enumerate(row):
+            if skill in skill_name.lower():
+                skill_row = y
+                skill_col = x+1
+                skill = skill_name
     start_col = starting_cell[0]
     start_row = int(starting_cell[1:])
     cell = f'{chr(ord(start_col)+skill_col)}{start_row+skill_row}'
     val = skill_table[skill_row][skill_col] if len(
         skill_table[skill_row]) > skill_col else 0
-    return (cell, val)
+    return (cell, val, skill)
 
 
 def query_character(character, property):
@@ -294,7 +297,7 @@ def query_character(character, property):
             return_val = result['values']
             if len(return_val) == 1 and len(return_val[0]) == 1:
                 return_val = result['values'][0][0]
-            return find_skill(result['values'], property, query.split(':')[0]) if is_skill else (query, return_val)
+            return find_skill(result['values'], property, query.split(':')[0]) if is_skill else (query, return_val, property)
         else:
             return None
 
@@ -305,12 +308,12 @@ def update_character(character, property, value):
         range_list = cell_map["range_list"]
         is_skill = property.lower() not in cell_map.keys()
         if is_skill:
-            query, skill_value = query_character(character, property)
+            query, skill_value, property = query_character(character, property)
         else:
             query = cell_map[property]
         if property in range_list:
             # First find next empty row
-            (query, existing) = query_character(character, property)
+            (query, existing, property) = query_character(character, property)
             starting_cell = query.split(":")[0]
             if existing is None:
                 query = starting_cell
