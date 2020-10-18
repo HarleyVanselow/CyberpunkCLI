@@ -82,20 +82,11 @@ def initiative():
 
 
 @roll.command()
-@click.argument('is_called') 
+@click.option('--target', type=click.Choice(['head', 'torso','right arm', 'left arm','right leg','left leg']), default=None) 
 @click.argument('weapon_name')
 @click.argument('opponent')
-def attack(is_called, weapon_name, opponent):
+def attack(weapon_name, opponent, target):
     """
-    :param is_called: If an attack is called, it aims at a specific 
-        part of the opponent's body but the attacker takes -4 penalty 
-        in attack damage. Allowed values: 1-10 for called attacks, 11 for uncalled
-        1: Head
-        2-4: Torso
-        5: Right arm
-        6: Left arm
-        7-8: Right leg
-        9-10: Left leg
     :param weapon: Pick a weapon from your inventory to use in the 
         current combat round. Allowed values: Names of weapons you own.
     :param opponent: Name of the person you are fighting against.
@@ -106,8 +97,6 @@ def attack(is_called, weapon_name, opponent):
     character = getpass.getuser()
     weapon = get_weapon_from_character(character, weapon_name) 
 
-    # Roll for hit location
-    loc = random.randrange(1, 11)
     body_map = {
         "head":[1],
         "toro":[2,3,4],
@@ -116,18 +105,18 @@ def attack(is_called, weapon_name, opponent):
         "right leg": [7,8],
         "left leg": [9, 10]
     }
-    loc = [k for k,v in body_map.items() if loc in v][0]
+    
+    if target is None:
+        # Roll for hit location
+        loc = random.randrange(1, 11)
+        loc = [k for k,v in body_map.items() if loc in v][0]
+        damage = 0
+        msg = f"The attack is not called - hit {loc}. "
+    else:
+        loc = target
+        damage = -4        
     # Get opponent's SP based on location
     query, sp, name = query_character(opponent, loc)
-    is_called = int(is_called)
-    if is_called == 11:
-        loc = random.randrange(1, 11)
-        damage = 0
-        msg = "The attack is not called - rolled %d for attack location" % loc
-    else:
-        loc = is_called
-        damage = -4        
-
 
     # Get opponent's body type
     query, btm, name = query_character(opponent, 'btm')
