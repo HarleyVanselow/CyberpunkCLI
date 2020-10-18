@@ -105,8 +105,11 @@ def update_character(character, property, value):
                         query = starting_col + str(int(starting_row) + i)
                         break
                     i += 1
-
-        body = {'values': [value]}
+        if isinstance(value[0], list):
+            v = value
+        else:
+            v = [value]
+        body = {'values': v}
         # pylint: disable=maybe-no-member
         sheet = SERVICE.spreadsheets()
         sheet.values().update(
