@@ -35,16 +35,44 @@ def deal_damage(character, new_damage):
     :param int new_damage: amount of additional damage to 
         be dealt to the character
     """
-    query, wounds_list, name = query_character(character, 'wounds')
+    print("%d damage has been done to %s" % (new_damage, character))
+
+    cat_max = 4
+    _, wounds_list, _ = query_character(character, 'wounds')
     if len(wounds_list) == 2:
-        pass
+        categories = wounds_list[0] + wounds_list[1]
+        wounds = []
     elif len(wounds_list) == 3:
-        pass
+        categories = wounds_list[0] + wounds_list[2]
+        wounds = wounds_list[1]
     elif len(wounds_list) == 4:
-        pass
+        categories = wounds_list[0] + wounds_list[2]
+        wounds = wounds_list[1] + wounds_list[3]
     else:
         raise ValueError("Incorrect wounds format in Google Sheets")
+    wounds_int = [int(x) for x in wounds]
 
+    while(len(wounds_int) < 10):
+        wounds_int.append(0)
+
+    for i in range(len(wounds_int)):
+        diff = cat_max - wounds_int[i]
+        bump = min(diff, new_damage)
+        wounds_int[i] += bump
+        new_damage -= bump
+
+    for i in range(len(categories)):
+        print(categories[i] + '  ' + 'x'*wounds_int[i])
+
+    wounds = [str(x) for x in wounds_int]
+
+    update_vals = [
+        categories[:5],
+        wounds[:5],
+        categories[5:],
+        wounds[5:]
+    ]
+    update_character(character, 'wounds', update_vals)
 
 
 def query_character(character, property):
