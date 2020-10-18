@@ -25,8 +25,8 @@ def get_weapon_from_character(character, weapon_name):
     from src.displayclasses import Weapon
     _, weapons, _ = query_character(character, 'weapon')
     for weapon in weapons:
-        if weapon[0].lower() in weapon_name.lower():
-            return Weapon(weapon[0], None)
+        if weapon_name.lower() in weapon[0].lower():
+            return Weapon({'flavor':weapon[0], 'type':'weapon'}, None)
 
 
 def deal_damage(character, new_damage):
