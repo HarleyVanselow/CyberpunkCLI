@@ -72,7 +72,7 @@ def deal_damage(character, new_damage):
         categories[5:],
         wounds[5:]
     ]
-    # update_character(character, 'wounds', update_vals)
+    update_character(character, 'wounds', update_vals)
 
 
 def query_character(character, property):
