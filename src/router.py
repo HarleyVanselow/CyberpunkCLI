@@ -9,7 +9,7 @@ import getpass
 import random
 from src import SERVICE, SHEET_ID
 from src.displayclasses import Base
-from src.sheetio import query_character, update_character, get_weapon_from_character, deal_damage
+from src.sheetio import query_character, update_character, get_weapon_from_character, deal_damage, get_wound_status
 from colorama import Fore, Back, Style
 
 
@@ -172,9 +172,11 @@ def stun():
     """
     character = getpass.getuser()
     bt = int(query_character(character, 'body')[1])
-    wound_status = 0
-    success = random.randrange(1, 11) < (bt - wound_status)
-    print('Stun save')
+    wound_status = get_wound_status(character)
+    roll = random.randrange(1, 11)
+    success = roll < (bt - wound_status)
+    status = 'succeeded' if success else 'failed'
+    print(f'Stun save {status}: rolled {roll} vs body type ({bt}) - wound status ({wound_status})')
 
 @save.command()
 def death():

@@ -29,16 +29,13 @@ def get_weapon_from_character(character, weapon_name):
             return Weapon({'flavor':weapon[0], 'type':'weapon'}, None)
 
 
-def deal_damage(character, new_damage):
-    """
-    :param str character: name of the character
-    :param int new_damage: amount of additional damage to 
-        be dealt to the character
-    """
-    new_damage = int(new_damage)
-    print("%d damage has been done to %s" % (new_damage, character))
+def get_wound_status(character):
+    wound_status = get_wound_values(character)
+    for i,item in enumerate(wound_status.items()):
+        if item[1] == 0:
+            return i - 1
 
-    cat_max = 4
+def get_wound_values(character):
     _, wounds_list, _ = query_character(character, 'wounds')
     if len(wounds_list) == 2:
         categories = wounds_list[0] + wounds_list[1]
@@ -55,6 +52,21 @@ def deal_damage(character, new_damage):
 
     while(len(wounds_int) < 10):
         wounds_int.append(0)
+    return dict(zip(categories,wounds_int))
+
+def deal_damage(character, new_damage):
+    """
+    :param str character: name of the character
+    :param int new_damage: amount of additional damage to 
+        be dealt to the character
+    """
+    new_damage = int(new_damage)
+    print("%d damage has been done to %s" % (new_damage, character))
+
+    cat_max = 4
+    wound_values = get_wound_values(character)
+    wounds_int = list(wound_values.values())
+    categories = list(wound_values.keys())
 
     for i in range(len(wounds_int)):
         diff = cat_max - wounds_int[i]
