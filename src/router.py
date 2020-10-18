@@ -102,9 +102,17 @@ def attack(is_called, weapon_name, opponent):
 
     # Roll for hit location
     loc = random.randrange(1, 11)
-
+    body_map = {
+        "head":[1],
+        "toro":[2,3,4],
+        "right arm":[5],
+        "left arm": [6],
+        "right leg": [7,8],
+        "left leg": [9, 10]
+    }
+    loc = [k for k,v in body_map.items() if loc in v][0]
     # Get opponent's SP based on location
-    query, sp, name = query_character(opponent, 'loc_'+loc)
+    query, sp, name = query_character(opponent, loc)
 
     # Get opponent's body type
     query, btm, name = query_character(opponent, 'btm')
