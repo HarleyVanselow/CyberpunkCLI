@@ -161,15 +161,11 @@ def damage(character, new_damage):
     deal_damage(character, damage)
 
 
-@click.argument('type', type=click.Choice(['stun', 'death']), default='stun')
-@roll.command()
-def save(type):
-    if type == 'stun':
-        stun()
-    elif type == 'death':
-        death()
+@roll.group()
+def save():
+    pass
 
-
+@save.command()
 def stun():
     """
     Roll a stun save
@@ -180,7 +176,7 @@ def stun():
     success = random.randrange(1, 11) < (bt - wound_status)
     print('Stun save')
 
-
+@save.command()
 def death():
     """
     Roll a death save
