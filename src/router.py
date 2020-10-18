@@ -38,7 +38,13 @@ def uc(character, property, value):
 @click.argument('target')
 @click.option('--auth', default=None)
 def connect(target, auth):
-    with open(f'./flavor_text/{target}.json') as target:
+    file = [file for file in os.listdir('./flavor_text') if target.lower() in file.lower()]
+    if len(file) > 0:
+        target = file[0]
+    else:
+        print(f'No target matching request "{target}"')
+        return
+    with open(f'./flavor_text/{target}') as target:
         target = json.load(target)
         admin = 'access_code' in target.keys(
         ) and auth == target['access_code']
