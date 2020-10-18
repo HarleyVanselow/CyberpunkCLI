@@ -3,6 +3,8 @@ from tabulate import tabulate
 import click
 import getpass
 from src.sheetio import query_character, update_character
+
+
 class Base:
     def _color_replace(self, input):
         color_map = {
@@ -25,7 +27,7 @@ class Base:
         return self.flavor
 
     def get_properties(self):
-        return self.target
+        return self.__dict__
 
     def display_options(self, to_display=[]):
         if self.options:
@@ -134,14 +136,18 @@ class Item(Base):
 
     def __init__(self, target, admin):
         super().__init__(target, admin)
-        self.cost = target['cost']
-        pass
+        with open('items.csv') as items_file:
+            for line in items_file.readlines()[1:]:
+                item_description = line.rstrip().split('\t')
+                if self.flavor.lower() in item_description[0].lower():
+                    self.cost = item_description[1]
+                    self.weight = item_description[2]
+                    break
 
 
 class Gear(Item):
     def __init__(self, target, admin):
         super().__init__(target, admin)
-        self.weight = target['weight']
 
     def get_type_name(self):
         return "Gear"
@@ -162,28 +168,36 @@ class Weapon(Item):
 
     def __init__(self, target, admin):
         super().__init__(target, admin)
-        self.weapon_type = target['weapon_type']
-        self.accuracy = target['accuracy']
-        self.con = target['concealability']
-        self.avail = target['availability']
-        self.damage_ammo = target['damage/ammunition']
-        self.num_shots = target['num_shots']
-        self.rof = target['rate_of_fire']
-        self.rel = target['reliability']
-        self.range = target['range']
+        with open('weapons.csv') as weapons_file:
+            for line in weapons_file.readlines()[1:]:
+                weapon_description = line.rstrip().split('\t')
+                if target['flavor'].lower() in weapon_description[0].lower():
+                    self.flavor = weapon_description[0]
+                    self.weapon_type = weapon_description[1]
+                    self.accuracy = weapon_description[2]
+                    self.con = weapon_description[3]
+                    self.avail = weapon_description[4]
+                    self.damage_ammo = weapon_description[5]
+                    self.num_shots = weapon_description[6]
+                    self.rof = weapon_description[7]
+                    self.rel = weapon_description[8]
+                    self.range = weapon_description[9]
+                    self.cost = weapon_description[10]
+                    break
 
     def get_display_fields(self):
         fields = super().get_display_fields()
         fields.update({
             'weapon_type': 'Type',
             "accuracy": "Accuracy",
-            "concealability": "Concealability",
-            "availability": "Availability",
-            "damage/ammunition": "Damage/Ammo",
+            "con": "Concealability",
+            "avail": "Availability",
+            "damage_ammo": "Damage/Ammo",
             "num_shots": "#Shots",
-            "rate_of_fire": "Rate of Fire",
-            "reliability": "Reliability",
-            "range": "Range"
+            "rof": "Rate of Fire",
+            "rel": "Reliability",
+            "range": "Range",
+            "cost": "Cost (eb)"
         })
         return fields
 
@@ -191,5 +205,5 @@ class Weapon(Item):
         update_character(self.character, "weapon", [
             self.flavor, self.weapon_type, self.accuracy, self.con,
             self.avail, self.damage_ammo, self.num_shots, self.rof,
-            self.rel, self.range
+            self.rel, self.range, self.cost
         ])

@@ -21,25 +21,12 @@ def find_skill(skill_table, skill, starting_cell):
     return (cell, val, skill)
 
 
-def get_weapon(character, weapon_name):
-    from src.displayclasses import Base
+def get_weapon_from_character(character, weapon_name):
+    from src.displayclasses import Weapon
     _, weapons, _ = query_character(character, 'weapon')
     for weapon in weapons:
         if weapon[0].lower() in weapon_name.lower():
-            return Base({
-                        "type": "weapon",
-                        "flavor": weapon[0],
-                        "weapon_type": weapon[1],
-                        "accuracy": weapon[2],
-                        "concealability": weapon[3],
-                        "availability": weapon[4],
-                        "damage/ammunition": weapon[5],
-                        "num_shots": weapon[6],
-                        "rate_of_fire": weapon[7],
-                        "reliability": weapon[8],
-                        "range": weapon[9],
-                        "cost": None
-                        }, None).get_type()
+            return Weapon(weapon[0], None)
 
 
 def deal_damage(character, new_damage):

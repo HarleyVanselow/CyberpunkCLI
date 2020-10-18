@@ -9,7 +9,7 @@ import getpass
 import random
 from src import SERVICE, SHEET_ID
 from src.displayclasses import Base
-from src.sheetio import query_character, update_character, get_weapon, deal_damage
+from src.sheetio import query_character, update_character, get_weapon_from_character, deal_damage
 from colorama import Fore, Back, Style
 
 @click.group()
@@ -88,7 +88,7 @@ def attack(is_called, weapon_name, opponent):
     # printed with --help
     # Get weapon stats
     character = getpass.getuser()
-    weapon = get_weapon(character, weapon_name) #TODO: Implement get_weapon()
+    weapon = get_weapon_from_character(character, weapon_name) #TODO: Implement get_weapon()
 
     # Roll for hit location
     loc = random.randrange(1, 11)

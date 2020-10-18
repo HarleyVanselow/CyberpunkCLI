@@ -31,11 +31,11 @@ Gear
   Item #  Name       Price (eb/unit)    Weight (kg)
 --------  -------  -----------------  -------------
        1  Pepsi                   50            0.5
-       2  Cheetos                 50            0.3
+       2  Cheetos                 20            0.3
 Weapons
-  Item #  Name      Price (eb/unit)  Type      Accuracy  Concealability    Availability    Damage/Ammo      #Shots    Rate of Fire  Reliability      Range
---------  ------  -----------------  ------  ----------  ----------------  --------------  -------------  --------  --------------  -------------  -------
-       3  C-6                   100  HVY              0  P                 P               8D10 per kg           1               1  VR                  -1
+  Item #  Name                        Cost (eb)  Type      Accuracy  Concealability    Availability    Damage/Ammo      #Shots    Rate of Fire  Reliability    Range
+--------  ------------------------  -----------  ------  ----------  ----------------  --------------  -------------  --------  --------------  -------------  -------
+       3  Malorian Arms Silver Gun          375  P                0  J                 P               2x2cm frags           7               2  UR             50m
 Or q to quit
 : q
 """ == result.output

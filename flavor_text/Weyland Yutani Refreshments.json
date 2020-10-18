@@ -7,29 +7,15 @@
     "options":[
         {
             "type":"gear",
-            "flavor":"Pepsi",
-            "cost":50,
-            "weight":0.5
+            "flavor":"Pepsi"
         },
         {
             "type":"gear",
-            "flavor":"Cheetos",
-            "cost":50,
-            "weight":0.3
+            "flavor":"Cheetos"
         },
         {
             "type":"weapon",
-            "flavor":"C-6",
-            "weapon_type":"HVY",
-            "accuracy":0,
-            "concealability":"P",
-            "availability":"P",
-            "damage/ammunition":"8D10",
-            "num_shots":1,
-            "rate_of_fire":1,
-            "reliability":"VR",
-            "range":"-1",
-            "cost":100
+            "flavor":"Malorian Arms Silver Gun"
         }
     ]
 }

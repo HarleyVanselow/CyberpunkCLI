@@ -1,0 +1,92 @@
+Name	Type	WA	Con	Avail.	Damage/Ammo	#Shots	ROF	Rel.	Range	Cost
+Armalite 44	P	0	J	E	4D6+1 (12mm)	8	1	ST	50m	450
+Astra Style-6	P	-1	P	E	1d6 (5mm)	6	2	UR	50m	75
+BudgetArms Auto 3	P	-1	J	E	3D6 (11mm)	8	2	UR	50m	350
+BudgetArms C-13	P	-1	P	E	1D6 (5mm)	8	2	ST	50m	75
+BudgetArms Laser-Niner	P	1	J	P	2D6+1 (9mm)	15	1	ST	50m	675
+Colt .38 Detective	P	+1	J	C	1d6+2 (.38)	6	1	VR	50m	200
+Colt AMT Model 2000	P	0	J	C	4D6+1 (12mm)	8	1	VR	50m	500
+Colt Alpha-Omega	P	2	J	C	2D6+2 (.45 ACCP)	10	2	VR	50m	500
+Dai Lung Cybermag 15	P	-1	P	C	1D6+1 (6mm)	10	2	UR	50m	50
+Dai Lung Streemaster	P	0	J	E	2D6+3 (10mm)	12	2	UT	50m	250
+Federated Arms .22	P	0	J	E	1d6 (.22)	10	2	ST	50m	50
+Federated Arms Impact	P	+1	J	E	1d6 (.22)	10	2	VR	50m	60
+Federated Arms X-22	P	0	J	E	1D6+1 (6mm)	10	2	ST	50m	150
+Federated Arms X-38	P	+1	J	E	2d6 (.38)	10	2	ST	50m	35
+Federated Arms X-9mm	P	0	J	E	2D6+1 (9mm)	12	2	ST	50m	300
+Glock Thirty MP	P	2	J	C	2d6+3 (10mm)	20	1	VR	50m	705
+Goncz-Tauras Pistol	P	0	J	E	2d6+1 (8mm)	15	2	ST	50m	200
+H&K P-11	P	0	J	P	4d6+1 (6mmRkt)	5	1	VR	50	700
+Malorian Arms Silver Gun	P	0	J	P	2x2cm frags	7	2	UR	50m	375
+Militech Arms Avenger	P	0	J	E	2D6+1 (9mm)	10	2	VR	50m	250
+Sternmeyer Type 35	P	0	J	C	3D6 (11mm)	8	2	VR	50m	400
+Towa 12 Polic Pistol	P	+3	J	P	1d6+1 (6mm)	8	2	VR	50m	450
+Goncz-Taurus MP	P	-1	J	C	2d6+1 (9mm)	15	2	ST	50m	675
+Fashion Gun 9	P	0	P	E	2d6+1 (9mm)	7	2	UR	25m	40
+Generic Wondernine	P	+1	J	E	2d6+1 (9mm)	14	2	VR	50m	240
+Beretta M97P	P	+2	J	P	2d6+1 (9mm)	18	2	VR	50m	480
+CCMMC Goaxing CM-3	P	0	J	C	2d6+1 (9mm)	8	2	ST	50m	75
+Kang Tao Type 97	P	+1	J	E	2d6+1 (9mm)	10	2	UR	50m	35
+Sci Fi Starrior 4	P	0	J	E	2d6+1 (9mm)	12	2	UR	50m	60
+Teen Dreem	P	-1	J	E	2d6+1 (9mm)	10	2	UR	50m	36
+Texas Arms 351 Gyrojet	P	0	J	C	2d6+1 (9mm Gyro)	8	2	UR	50m	420
+Calico Assault Pistol	P	0	L	C	2d6+1 (9mm C)	50	2	VR	50m	450
+Beretta Plas 9 Fashion	P	-1	P	P	2d6+1 (9mm)	10	1	ST	50m	200
+Uzi Miniauto 9	SMG	+1	J	E	2D6+1 (9mm)	30	35	VR	150m	475
+H&K MP-2013	SMG	+1	J	C	2D6+3 (10mm)	35	32	ST	150m	450
+Fed. Arms Tech Assault II	SMG	+1	J	C	1D6+1 (6mm)	50	25	ST	150m	400
+Araska Minami 10	SGM	0	J	E	2D6+3 (10mm)	40	20	VR	200m	500
+H&K MPK-9	SMG	+1	J	C	2D6+1 (9mm)	35	25	ST	200m	520
+Sternmeyer SMG 21	SMG	-1	L	E	3d6 (11mm)	30	15	VR	200m	500
+H&K MPK-11	SMG	0	L	C	4D6+1 (12mm)	30	20	ST	200m	700
+Ingram MAC 14	SMG	-2	L	E	4D6 (12mm)	20	10	ST	200m	650
+Setsuko-Araska PMS Adv.	SMG	1	L	P	1d6+2 (7mm)	40	20	ST	200m	1150
+Beretta M-24 Adv.SMG	SMG	2	L	P	2d6+1 (8mm)	50	25	VR	200m	1250
+Malorian Arms Sub-Flechette	SMG	2	J	C	10mm Flech	10	3	VR	100m	795
+Militech Mini-Gat	SMG	0	L	P	1d6 (.22C)	120	40	ST	100m	695
+Militech-10 SMG	SMG	1	J	E	2d6+3 (10mm)	30	20	ST	100m	455
+Militech-10 SMG	SMG	1	J	E	2d6+2 (.45)	30	20	ST	100m	455
+Militech Ronin Light Assault	RIF	+1	N	C	5D6 (5.56)	35	30	VR	400m	450
+AKR-20 Medium Assault	RIF	0	N	C	5D6 (5.56)	30	30	ST	400m	500
+FN-RAL Heavy Assault Rifle	RIF	-1	N	C	6D6+2 (7.62)	30	20	VR	400m	600
+Kalishnikov A-80 Hvy. Rifle	RIF	-1	N	E	6D6+2 (7.62)	35	25	ST	400m	550
+Militech Elect. LaserCannon	RIF	+2	N	R	1-5d6	10	2	UR	200m	8000
+Tsunami Arms Ramjet	RIF	+3	N	P	5d6+3-7d6+3	9	3	VR	800m	1230
+Polymer One-Shot Cannon	RIF	-2	L	C	4d6+2 (13mm)	1	1	UR	100m	90
+Militech Cyborg Rifle	RIF	+1	N	P	7d6+3AP (.300WM)	30	2	ST	500m	800
+Pursuit Security Webgun	RIF	+1	N	C	Entangle	1	1	ST	30m	250
+Underbarrel Capacitor Laser	RIF	+2	*	R	3d6	2	2	UR	25m	950
+Techtronica M40 Pulse Rifle	RIF	0	N	R	EMP	6	0.5	ST	50m	3500
+Militech M-31a1 AICW	RIF	2	N	R	4d6 (4.5mm)	150	30	ST	200m	1695
+Darra-Polytechnic M-9 AR	RIF	0	N	P	4d6+2 (5.5mm)	40	25	ST	200m	300
+Federated Arms Light Assault 15	RIF	0	N	C	5d6 (7mmC)	30	25	VR	200m	400
+Stein & Wasserman Model F	RIF	0	L	P	(13mm)	8	1	VR	200m	1650
+Araska Rapid Assault 12	SHT	-1	N	C	4D6 (00)	20	10	ST	50m	900
+Sternmeyer Stakeout 10	SHT	-2	N	R	4D6 (00)	10	2	ST	50m	450
+Militech Crusher SSG	SHT	-1	J	C	3D6 (20ga)	6	2	ST	50m	450
+Luigi Franchi King Buck	SHT	-1	N	P	6d6-4d6	4	2	VR	50m	800
+Militech Military Shotgun	SHT	0	N	C	4d6 (12ga)	8	2	ST	50m	300
+Barret-Arasaka Light 20mm	HVY	0	N	R	4D10 (20mm)	10	1	VR	450m	2000
+Scorpion 16 Missile Launcher	HVY	-1	N	R	7D10	1	1	VR	1km	3000
+Militech Arms RPG-A	HVY	-2	N	R	6D10	1	1	VR	1km	1500
+K-A F-253 Flamethrower	HVY	-2	N	R	2D10	10	1	ST	50m	1500
+Rhinemetall EMG-85 Railgun	HVY	+3	N	R	5d10+10 (EAP)	5	0.5	ST	1500m	11370
+Militech AM-3 AntiMatter	HVY	0	N	R	6d10+2 (30mmEHI)	5	1	ST	1600m	6000
+Militech Urban Missile Launch.	HVY	+2	L	P	4d6 (MicroMiss)	12	2	ST	200m	900
+Club	Melee	0	N	C	1D6	NA	NA	NA	1m	0
+Knife	Melee	0	P	C	1D6	NA	NA	NA	1m	10
+Sword	Melee	0	N	C	2D6+2	NA	NA	NA	1m	100
+Axe	Melee	0	N	C	2D6+3	NA	NA	NA	1m	20
+Nunchaku/Tonfa	Melee	0	L	C	3D6	NA	NA	NA	1m	15
+Naginata	Melee	0	N	P	3D6	NA	NA	NA	2m	100
+Shiriken	Melee	0	P	C	1D6/3	NA	NA	NA	Throw	3
+Brass Knuckles	Melee	0	P	C	1D6+2	NA	NA	NA	1m	10
+Switchblade	Melee	0	P	C	1D6/2	NA	NA	NA	1m	15
+Imi Chainknife	Melee	0	J	P	2d6+1	NA	NA	VR	1	120
+Slamdance Inc. Spawnblade	Melee	0	J	P	1d6+BOD	NA	NA	ST	1m	450
+Kendachi Monowhip	Melee	0	J	P	2d6	NA	NA	ST	3m	350
+Mystic Technologies	Melee	0	P	C	1d6	NA	NA	ST	5m	125
+Dynatech Industries Hand Taser	EX	0	P	E	Stun	12	1	VR	0m	50
+EagleTech Tomcat C-Bow	EX	0	N	C	4d6	12	1	VR	150m	150
+EagleTech Stryker X-Bow	EX	-1	N	C	3d6+3	12	1	VR	50m	220
+Underbarrel Microwaver	EX	0	*	P	1d6	4	2	ST	20m	500
