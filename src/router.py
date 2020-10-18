@@ -157,9 +157,29 @@ def damage(character, new_damage):
     deal_damage(character, damage)
 
 
-@roll.command()
+@roll.group()
 def save():
     pass
+
+@save.commmand()
+def stun():
+    """
+    Roll a stun save
+    """
+    character = getpass.getuser()
+    bt = query_character(character, 'body')
+    wound_status = 0
+    success = random.randrange(1,11) < (bt - wound_status)
+
+@save.command()
+def death():
+    """
+    Roll a death save
+    """
+    character = getpass.getuser()
+    bt = query_character(character, 'body')
+    wound_status = 0
+    success = random.randrange(1,11) < (bt - wound_status)
 
 
 def base_roll(stats, d, skill):
