@@ -145,7 +145,17 @@ def attack(is_called, weapon_name, opponent):
     # Update opponent's wounds
     msg += "Total damage is %d" % damage
     print(msg)
-    # deal_damage(opponent, damage)
+
+
+@roll.command()
+@click.argument('character')
+@click.argument('new_damage')
+def damage(character, new_damage):
+    """
+    :param str character
+    :param int new_damage: additional damage to be dealt to the character
+    """
+    deal_damage(character, damage)
 
 
 @roll.command()
