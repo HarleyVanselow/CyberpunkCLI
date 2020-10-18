@@ -82,8 +82,8 @@ def initiative():
 
 
 @roll.command()
-@click.argument('is_called')
-@click.argument('weapon')
+@click.argument('is_called') 
+@click.argument('weapon_name')
 @click.argument('opponent')
 def attack(is_called, weapon_name, opponent):
     """
@@ -98,7 +98,7 @@ def attack(is_called, weapon_name, opponent):
     # printed with --help
     # Get weapon stats
     character = getpass.getuser()
-    weapon = get_weapon_from_character(character, weapon_name) #TODO: Implement get_weapon()
+    weapon = get_weapon_from_character(character, weapon_name) 
 
     # Roll for hit location
     loc = random.randrange(1, 11)
@@ -120,10 +120,14 @@ def attack(is_called, weapon_name, opponent):
         damage += random.randrange(1, d+1)
 
     # Compute final damage on opponent
-    damage = damage - sp - btm
+    if sp:
+        damage -= sp
+    if btm:
+        damage -= btm
 
     # Update opponent's wounds
-    deal_damage(opponent, damage)
+    print("Total damage is %d" % damage)
+    # deal_damage(opponent, damage)
 
 
 @roll.command()
