@@ -158,7 +158,7 @@ def damage(character, new_damage):
     :param str character
     :param int new_damage: additional damage to be dealt to the character
     """
-    deal_damage(character, damage)
+    deal_damage(character, new_damage)
 
 
 @click.argument('type', type=click.Choice(['stun', 'death']), default='stun')

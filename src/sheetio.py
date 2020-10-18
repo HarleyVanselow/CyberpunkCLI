@@ -35,6 +35,7 @@ def deal_damage(character, new_damage):
     :param int new_damage: amount of additional damage to 
         be dealt to the character
     """
+    new_damage = int(new_damage)
     print("%d damage has been done to %s" % (new_damage, character))
 
     cat_max = 4
