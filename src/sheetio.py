@@ -76,7 +76,7 @@ def query_character(character, property):
                 return_val = result['values'][0][0]
             return find_skill(result['values'], property, query.split(':')[0]) if is_skill else (query, return_val, property)
         else:
-            return None
+            return (query, None, property)
 
 
 def update_character(character, property, value):
