@@ -39,3 +39,20 @@ Weapons
 Or q to quit
 : q
 """ == result.output
+
+def test_connect_shop_fuzzy_name():
+    runner = CliRunner()
+    result = runner.invoke(connect, ['weyland'], input='q\n')
+    assert """Welcome to [32mWeyland Yutani Refreshments[0m, please select a purchase
+Gear
+  Item #  Name       Price (eb/unit)    Weight (kg)
+--------  -------  -----------------  -------------
+       1  Pepsi                   50            0.5
+       2  Cheetos                 20            0.3
+Weapons
+  Item #  Name                        Cost (eb)  Type      Accuracy  Concealability    Availability    Damage/Ammo      #Shots    Rate of Fire  Reliability    Range
+--------  ------------------------  -----------  ------  ----------  ----------------  --------------  -------------  --------  --------------  -------------  -------
+       3  Malorian Arms Silver Gun          375  P                0  J                 P               2x2cm frags           7               2  UR             50m
+Or q to quit
+: q
+""" == result.output
