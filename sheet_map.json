@@ -24,5 +24,6 @@
     "right leg":"F12",
     "left leg":"G12",
     "wounds":"C14:G17",
+    "wounds_start": "C14",
     "range_list":["gear", "weapon", "cybernetics"]
 }
