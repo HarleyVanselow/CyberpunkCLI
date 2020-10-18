@@ -12,6 +12,7 @@ from src.displayclasses import Base
 from src.sheetio import query_character, update_character, get_weapon_from_character, deal_damage
 from colorama import Fore, Back, Style
 
+
 @click.group()
 def route():
     pass
@@ -38,7 +39,8 @@ def uc(character, property, value):
 @click.argument('target')
 @click.option('--auth', default=None)
 def connect(target, auth):
-    file = [file for file in os.listdir('./flavor_text') if target.lower() in file.lower()]
+    file = [file for file in os.listdir(
+        './flavor_text') if target.lower() in file.lower()]
     if len(file) > 0:
         target = file[0]
     else:
@@ -55,6 +57,7 @@ def connect(target, auth):
 def roll():
     pass
 
+
 @roll.command()
 @click.option('--stat', default=None)
 @click.option('--D', default=10, type=click.INT)
@@ -64,9 +67,10 @@ def skillcheck(stat, d, skill):
     print(msg)
     os.system(f'wall "{msg}"')
 
+
 @roll.command()
 def facedown():
-    msg = base_roll(['cool','rep'], 10, None)
+    msg = base_roll(['cool', 'rep'], 10, None)
     print('This is the final facedown!')
     print(msg)
     os.system(f'wall "{msg}"')
@@ -82,7 +86,7 @@ def initiative():
 
 
 @roll.command()
-@click.option('--target', type=click.Choice(['head', 'torso','right arm', 'left arm','right leg','left leg']), default=None) 
+@click.option('--target', type=click.Choice(['head', 'torso', 'right arm', 'left arm', 'right leg', 'left leg']), default=None)
 @click.argument('weapon_name')
 @click.argument('opponent')
 def attack(weapon_name, opponent, target):
@@ -91,30 +95,30 @@ def attack(weapon_name, opponent, target):
         current combat round. Allowed values: Names of weapons you own.
     :param opponent: Name of the person you are fighting against.
     """
-    #TODO: Make the docstring keep its formatting when 
+    # TODO: Make the docstring keep its formatting when
     # printed with --help
     # Get weapon stats
     character = getpass.getuser()
-    weapon = get_weapon_from_character(character, weapon_name) 
+    weapon = get_weapon_from_character(character, weapon_name)
 
     body_map = {
-        "head":[1],
-        "toro":[2,3,4],
-        "right arm":[5],
+        "head": [1],
+        "toro": [2, 3, 4],
+        "right arm": [5],
         "left arm": [6],
-        "right leg": [7,8],
+        "right leg": [7, 8],
         "left leg": [9, 10]
     }
-    
+
     if target is None:
         # Roll for hit location
         loc = random.randrange(1, 11)
-        loc = [k for k,v in body_map.items() if loc in v][0]
+        loc = [k for k, v in body_map.items() if loc in v][0]
         damage = 0
         msg = f"The attack is not called - hit {loc}. "
     else:
         loc = target
-        damage = -4        
+        damage = -4
     # Get opponent's SP based on location
     query, sp, name = query_character(opponent, loc)
 
@@ -157,9 +161,35 @@ def damage(character, new_damage):
     deal_damage(character, damage)
 
 
+@click.argument('type', type=click.Choice(['stun', 'death']), default='stun')
 @roll.command()
-def save():
-    pass
+def save(type):
+    if type == 'stun':
+        stun()
+    elif type == 'death':
+        death()
+
+
+def stun():
+    """
+    Roll a stun save
+    """
+    character = getpass.getuser()
+    bt = int(query_character(character, 'body')[1])
+    wound_status = 0
+    success = random.randrange(1, 11) < (bt - wound_status)
+    print('Stun save')
+
+
+def death():
+    """
+    Roll a death save
+    """
+    character = getpass.getuser()
+    bt = int(query_character(character, 'body')[1])
+    wound_status = 0
+    success = random.randrange(1, 11) < (bt - wound_status)
+    print('Death save')
 
 
 def base_roll(stats, d, skill):
@@ -169,12 +199,14 @@ def base_roll(stats, d, skill):
     for stat in stats:
         stat_results[stat] = query_character(character, stat)[1]
     skill_notification = ']'
-    stat_notification = ' + '.join([f"{v} ({k})" for k,v in stat_results.items()])
+    stat_notification = ' + '.join([f"{v} ({k})" for k,
+                                    v in stat_results.items()])
     skill_modifier = 0
     if skill:
         _, skill_modifier, skill = query_character(character, skill)
         skill_modifier = 0 if skill_modifier == '' else skill_modifier
         skill_notification = f' + {skill_modifier} ({skill})]'
-    total = int(result) + sum([int(v) for v in stat_results.values()]) + int(skill_modifier)
+    total = int(result) + sum([int(v)
+                               for v in stat_results.values()]) + int(skill_modifier)
     message = f"{character} rolled a {Fore.GREEN}{total}!{Style.RESET_ALL} [{result} (roll) + {stat_notification}{skill_notification}"
     return message

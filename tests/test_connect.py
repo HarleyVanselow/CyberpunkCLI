@@ -36,6 +36,7 @@ Weapons
   Item #  Name                        Cost (eb)  Type      Accuracy  Concealability    Availability    Damage/Ammo      #Shots    Rate of Fire  Reliability    Range
 --------  ------------------------  -----------  ------  ----------  ----------------  --------------  -------------  --------  --------------  -------------  -------
        3  Malorian Arms Silver Gun          375  P                0  J                 P               2x2cm frags           7               2  UR             50m
+       4  Federated Arms Impact              60  P               +1  J                 E               1d6 (.22)            10               2  VR             50m
 Or q to quit
 : q
 """ == result.output
@@ -53,6 +54,7 @@ Weapons
   Item #  Name                        Cost (eb)  Type      Accuracy  Concealability    Availability    Damage/Ammo      #Shots    Rate of Fire  Reliability    Range
 --------  ------------------------  -----------  ------  ----------  ----------------  --------------  -------------  --------  --------------  -------------  -------
        3  Malorian Arms Silver Gun          375  P                0  J                 P               2x2cm frags           7               2  UR             50m
+       4  Federated Arms Impact              60  P               +1  J                 E               1d6 (.22)            10               2  VR             50m
 Or q to quit
 : q
 """ == result.output
