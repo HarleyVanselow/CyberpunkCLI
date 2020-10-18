@@ -83,7 +83,13 @@ def attack(is_called, weapon_name, opponent):
     """
     :param is_called: If an attack is called, it aims at a specific 
         part of the opponent's body but the attacker takes -4 penalty 
-        in attack damage. Allowed values: True or False.
+        in attack damage. Allowed values: 1-10 for called attacks, 11 for uncalled
+        1: Head
+        2-4: Torso
+        5: Right arm
+        6: Left arm
+        7-8: Right leg
+        9-10: Left leg
     :param weapon: Pick a weapon from your inventory to use in the 
         current combat round. Allowed values: Names of weapons you own.
     :param opponent: Name of the person you are fighting against.
@@ -95,32 +101,44 @@ def attack(is_called, weapon_name, opponent):
     weapon = get_weapon_from_character(character, weapon_name) 
 
     # Roll for hit location
-    loc = random.randrange(1, 11)
+    is_called = int(is_called)
+    if is_called == 11:
+        loc = random.randrange(1, 11)
+        damage = 0
+        msg = "The attack is not called - rolled %d for attack location" % loc
+    else:
+        loc = is_called
+        damage = -4        
 
     # Get opponent's SP based on location
-    query, sp, name = query_character(opponent, 'loc_'+loc)
+    query, sp, name = query_character(opponent, 'loc_'+str(loc))
 
     # Get opponent's body type
     query, btm, name = query_character(opponent, 'btm')
 
     # Roll for damage
-    # Assuming weapon.damage_ammo is always in the form of "XDY+Z(mm)"
-    damage_stat = weapon.damage_ammo.split(' ')[0]
-    roll, bonus = damage_stat.split('+')
-    bonus = int(bonus)
-    times, d = [int(x) for x in roll.split('D')]
-    damage = bonus
+    # Assuming weapon.damage_ammo is always in the form of "XDY+Z (mm)"
+    damage_stat = weapon.damage_ammo.lower().split(' ')[0]
+    if '+' in damage_stat:
+        # XdY+Z
+        roll, bonus = damage_stat.split('+')
+        bonus = int(bonus)
+        damage += bonus
+    else:
+        roll = damage_stat
+    times, d = [int(x) for x in roll.split('d')]
     for i in range(times):
         damage += random.randrange(1, d+1)
 
     # Compute final damage on opponent
     if sp:
-        damage -= sp
+        damage -= int(sp)
     if btm:
-        damage -= btm
+        damage -= int(btm)
 
     # Update opponent's wounds
-    print("Total damage is %d" % damage)
+    msg += "Total damage is %d" % damage
+    print(msg)
     # deal_damage(opponent, damage)
 
 
