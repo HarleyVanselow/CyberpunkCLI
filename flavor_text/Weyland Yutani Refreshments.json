@@ -16,6 +16,10 @@
         {
             "type":"weapon",
             "flavor":"Malorian Arms Silver Gun"
+        },
+        {
+            "type":"weapon",
+            "flavor":"Impact"
         }
     ]
 }

@@ -54,17 +54,21 @@ def roll():
 @click.option('--D', default=10, type=click.INT)
 @click.option('--skill', default='')
 def skillcheck(stat, d, skill):
-    msg = base_roll(stat, d, skill)
+    msg = base_roll([stat], d, skill)
     print(msg)
     os.system(f'wall "{msg}"')
 
 @roll.command()
 def facedown():
+    msg = base_roll(['cool','rep'], 10, None)
     print('This is the final facedown!')
+    print(msg)
+    os.system(f'wall "{msg}"')
+
 
 @roll.command()
 def initiative():
-    msg = 'Rolling for initiative: ' + base_roll('REF', 10, None) + '\n'
+    msg = 'Rolling for initiative: ' + base_roll(['REF'], 10, None) + '\n'
     msg += 'Special case: if a QUICK DRAW is declared, add 3 to intiative roll' \
         ' and take 3 extra damage in the current combat round.'
     print(msg)
@@ -72,7 +76,7 @@ def initiative():
 
 
 @roll.command()
-@click.argument('is_called') 
+@click.argument('is_called')
 @click.argument('weapon')
 @click.argument('opponent')
 def attack(is_called, weapon_name, opponent):
@@ -121,16 +125,19 @@ def save():
     pass
 
 
-def base_roll(stat, d, skill):
+def base_roll(stats, d, skill):
     result = random.randrange(1, d+1)
     character = getpass.getuser()
-    stat_modifier = query_character(character, stat)[1]
+    stat_results = {}
+    for stat in stats:
+        stat_results[stat] = query_character(character, stat)[1]
     skill_notification = ']'
+    stat_notification = ' + '.join([f"{v} ({k})" for k,v in stat_results.items()])
     skill_modifier = 0
     if skill:
         _, skill_modifier, skill = query_character(character, skill)
         skill_modifier = 0 if skill_modifier == '' else skill_modifier
         skill_notification = f' + {skill_modifier} ({skill})]'
-    total = int(result) + int(stat_modifier) + int(skill_modifier)
-    message = f"{character} rolled a {Fore.GREEN}{total}!{Style.RESET_ALL} [{result} (roll) + {stat_modifier} ({stat}){skill_notification}"
+    total = int(result) + sum([int(v) for v in stat_results.values()]) + int(skill_modifier)
+    message = f"{character} rolled a {Fore.GREEN}{total}!{Style.RESET_ALL} [{result} (roll) + {stat_notification}{skill_notification}"
     return message
