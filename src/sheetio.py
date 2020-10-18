@@ -42,6 +42,24 @@ def get_weapon(character, weapon_name):
                         }, None).get_type()
 
 
+def deal_damage(character, new_damage):
+    """
+    :param str character: name of the character
+    :param int new_damage: amount of additional damage to 
+        be dealt to the character
+    """
+    query, wounds_list, name = query_character(character, 'wounds')
+    if len(wounds_list) == 2:
+        pass
+    elif len(wounds_list) == 3:
+        pass
+    elif len(wounds_list) == 4:
+        pass
+    else:
+        raise ValueError("Incorrect wounds format in Google Sheets")
+
+
+
 def query_character(character, property):
     """Gets a stat value from a character sheet
 

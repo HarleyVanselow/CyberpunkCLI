@@ -9,7 +9,7 @@ import getpass
 import random
 from src import SERVICE, SHEET_ID
 from src.displayclasses import Base
-from src.sheetio import query_character, update_character, get_weapon
+from src.sheetio import query_character, update_character, get_weapon, deal_damage
 from colorama import Fore, Back, Style
 
 @click.group()
@@ -100,8 +100,8 @@ def attack(is_called, weapon_name, opponent):
     query, btm, name = query_character(opponent, 'btm')
 
     # Roll for damage
-    # Assuming weapon.damage is always in the form of "XDY+Z(mm)"
-    damage_stat = s.split('(')[0]
+    # Assuming weapon.damage_ammo is always in the form of "XDY+Z(mm)"
+    damage_stat = weapon.damage_ammo.split(' ')[0]
     roll, bonus = damage_stat.split('+')
     bonus = int(bonus)
     times, d = [int(x) for x in roll.split('D')]
@@ -113,7 +113,7 @@ def attack(is_called, weapon_name, opponent):
     damage = damage - sp - btm
 
     # Update opponent's wounds
-    
+    deal_damage(opponent, damage)
 
 
 @roll.command()
