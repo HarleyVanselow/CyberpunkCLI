@@ -14,7 +14,7 @@ def test_get_weapon_from_character():
               'accuracy': '+1',
               'con': 'J',
               'avail': 'E',
-              'damage_ammo': '1d6 (.22)',
+              'damage_ammo': '1d6(.22)',
               'num_shots': '10',
               'rof': '2',
               'rel': 'VR',

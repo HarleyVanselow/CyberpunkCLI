@@ -1,0 +1,17 @@
+{
+    "type": "store",
+    "flavor": "Welcome to <g>Superstore</>, please select a purchase",
+    "admin_flavor": "REGISTERED CONNECTION: STORE OWNER",
+    "access_code": "prometheus",
+    "money": 200,
+    "options": [
+        {
+            "type": "weapon",
+            "flavor": "Malorian Sliver"
+        },
+        {
+            "type": "weapon",
+            "flavor": "Tonfa"
+        }
+    ]
+}
