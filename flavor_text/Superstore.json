@@ -12,6 +12,10 @@
         {
             "type": "weapon",
             "flavor": "Tonfa"
+        },
+        {
+            "type":"armor",
+            "flavor":"Eji Armored"
         }
     ]
 }

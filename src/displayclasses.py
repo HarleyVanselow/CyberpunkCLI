@@ -81,6 +81,8 @@ class Base:
             return Weapon(self.target, self.admin)
         elif self.type == 'gear':
             return Gear(self.target, self.admin)
+        elif self.type == 'armor':
+            return Armor(self.target, self.admin)
 
 
 class Store(Base):
@@ -132,7 +134,7 @@ class Item(Base):
         raise NotImplementedError
 
     def get_display_fields(self):
-        return {"flavor": "Name", "cost": "Price (eb/unit)"}
+        return {"flavor": "Name", "cost": "Cost (eb)"}
 
     def __init__(self, target, admin):
         super().__init__(target, admin)
@@ -161,7 +163,29 @@ class Gear(Item):
         update_character(self.character, "gear", [
             self.flavor, self.cost, self.weight])
 
+class Armor(Item):
+    def get_type_name(self):
+        return "Armor"
 
+    def __init__(self, target, admin):
+        with open('armor.csv') as armor_file:
+            for line in armor_file.readlines()[1:]:
+                armor_description = line.rstrip().split('\t')
+                if target['flavor'].lower() in armor_description[0].lower():
+                    self.flavor = armor_description[0]
+                    self.covers = armor_description[1]
+                    self.sp = armor_description[2]
+                    self.ev = armor_description[3]
+                    self.cost = armor_description[4]
+                    break
+    def get_display_fields(self):
+        fields = super().get_display_fields()
+        fields.update({
+            "covers": "Coverage",
+            "sp": "Stopping Power",
+            "ev": "Encumberance"
+        })
+        return fields
 class Weapon(Item):
     def get_type_name(self):
         return "Weapons"
@@ -196,8 +220,7 @@ class Weapon(Item):
             "num_shots": "#Shots",
             "rof": "Rate of Fire",
             "rel": "Reliability",
-            "range": "Range",
-            "cost": "Cost (eb)"
+            "range": "Range"
         })
         return fields
 
