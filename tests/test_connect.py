@@ -1,4 +1,4 @@
-from src.router import connect
+from src.router import route
 from click.testing import CliRunner
 
 weyland_return = """Welcome to Weyland Yutani Refreshments, please select a purchase
@@ -13,37 +13,40 @@ Weapons
        3  Malorian Sliver Gun            372  P               +0  J                 P               2d6x1d6/2*(Sliver)         7               2  UR             40m
        4  Federated Arms Impact           60  P               +1  J                 E               1d6(.22)                  10               2  VR             50m
 Or q to quit
-: q
 """
 
 def test_connect_info():
     runner = CliRunner()
-    result = runner.invoke(connect, ['Night City Tourism'], input='q\n')
+    result = runner.invoke(route, ['--character','test','connect','Night City Tourism'])
     assert result.output == \
 """Night City offers a variety of exciting places to visit! To learn more, select one
 1) The Sewers
 2) The Docks
 Or q to quit
-: q
 """
+    runner.invoke(route, ['--character','test','connect','tourism','--cmds','q'])
+
 
 def test_connect_info_submenu():
     runner = CliRunner()
-    result = runner.invoke(connect, ['Night City Tourism'], input='1\ny\n')
-    assert """The sewers are incredibly scenic
-Exit? [y/N]: y
-""" in result.output
-    result = runner.invoke(connect, ['Night City Tourism'], input='2\ny\n')
-    assert """The Docks are next to water
-Exit? [y/N]: y
-""" in result.output
+    runner.invoke(route, ['--character','test','connect','Night City Tourism'])
+    result = runner.invoke(route, ['--character','test','connect','tourism','--cmds','1'])
+    assert """The sewers are incredibly scenic""" in result.output
+    result = runner.invoke(route, ['--character','test','connect','tourism','--cmds','2'])
+    assert """The Docks are next to water""" in result.output
+    result = runner.invoke(route, ['--character','test','connect','tourism','--cmds','q'])
+    assert """Goodbye""" in result.output
+
 
 def test_connect_shop():
     runner = CliRunner()
-    result = runner.invoke(connect, ['Weyland Yutani Refreshments'], input='q\n')
+    result = runner.invoke(route, ['--character','test','connect','Weyland Yutani Refreshments'])
     assert  weyland_return == result.output
+    result = runner.invoke(route, ['--character','test','connect','weyland','--cmds','q'])
+
 
 def test_connect_shop_fuzzy_name():
     runner = CliRunner()
-    result = runner.invoke(connect, ['weyland'], input='q\n')
+    result = runner.invoke(route, ['--character','test','connect','weyland'])
     assert weyland_return == result.output
+    result = runner.invoke(route, ['--character','test','connect','weyland','--cmds','q'])

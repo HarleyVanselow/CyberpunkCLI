@@ -176,7 +176,7 @@ def damage(character, new_damage):
 
 @roll.group()
 @click.pass_context
-def save():
+def save(ctx):
     pass
 
 @save.command()
