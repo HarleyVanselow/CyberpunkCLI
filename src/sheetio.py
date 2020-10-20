@@ -26,7 +26,7 @@ def get_weapon_from_character(character, weapon_name):
     _, weapons, _ = query_character(character, 'weapon')
     for weapon in weapons:
         if weapon_name.lower() in weapon[0].lower():
-            return Weapon({'flavor':weapon[0], 'type':'weapon'}, None)
+            return Weapon({'flavor':weapon[0], 'type':'weapon'}, None, character)
 
 
 def get_wound_status(character):

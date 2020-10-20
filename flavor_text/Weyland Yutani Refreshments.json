@@ -1,6 +1,6 @@
 {
     "type": "store",
-    "flavor": "Welcome to <g>Weyland Yutani Refreshments</>, please select a purchase",
+    "flavor": "Welcome to Weyland Yutani Refreshments, please select a purchase",
     "admin_flavor": "REGISTERED CONNECTION: STORE OWNER",
     "access_code": "prometheus",
     "money":200,

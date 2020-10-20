@@ -13,6 +13,6 @@ def test_get_weapon_from_index():
               'rel': 'VR',
               'range': '50m',
               'cost': '60'}
-    from_index = Weapon({'flavor':'Impact','type':'weapon'}, None).__dict__
+    from_index = Weapon({'flavor':'Impact','type':'weapon'}, None, None).__dict__
     for item in weapon.items():
         assert item in from_index.items()

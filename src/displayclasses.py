@@ -6,22 +6,11 @@ from src.sheetio import query_character, update_character
 
 
 class Base:
-    def _color_replace(self, input):
-        color_map = {
-            "g": Fore.GREEN,
-            "r": Fore.RED,
-            "b": Fore.BLUE,
-            "/": Style.RESET_ALL
-        }
-        for k, v in color_map.items():
-            input = input.replace(f'<{k}>', v)
-        return input
-
     def display(self):
         if self.admin_flavor != '' and self.admin:
-            print(self._color_replace(self.admin_flavor))
+            print(self.admin_flavor)
         else:
-            print(self._color_replace(self.flavor))
+            print(self.flavor)
 
     def get_summary(self):
         return self.flavor
@@ -33,7 +22,7 @@ class Base:
         if self.options:
             user_done = False
             while not user_done:
-                options = [Base(option, self.admin).get_type()
+                options = [Base(option, self.admin, self.character).get_type()
                            for option in self.options]
                 if isinstance(options[0], Item):
                     tables = {}
@@ -58,31 +47,31 @@ class Base:
                 if choice == 'q':
                     return
                 Base(self.options[int(choice)-1],
-                     self.admin).get_type().display()
+                     self.admin, self.character).get_type().display()
                 user_done = click.confirm('Exit?')
 
-    def __init__(self, target, admin):
+    def __init__(self, target, admin, character):
         self.type = target['type']
         self.target = target
         self.flavor = target['flavor']
         self.admin_flavor = target.get('admin_flavor', '')
         self.options = target.get('options', [])
         self.admin = admin
-        self.character = getpass.getuser()
+        self.character = character
 
     def get_type(self):
         if self.type == 'store':
-            return Store(self.target, self.admin)
+            return Store(self.target, self.admin, self.character)
         elif self.type == 'info':
-            return Info(self.target, self.admin)
+            return Info(self.target, self.admin, self.character)
         elif self.type == 'item':
-            return Item(self.target, self.admin)
+            return Item(self.target, self.admin, self.character)
         elif self.type == "weapon":
-            return Weapon(self.target, self.admin)
+            return Weapon(self.target, self.admin, self.character)
         elif self.type == 'gear':
-            return Gear(self.target, self.admin)
+            return Gear(self.target, self.admin, self.character)
         elif self.type == 'armor':
-            return Armor(self.target, self.admin)
+            return Armor(self.target, self.admin, self.character)
 
 
 class Store(Base):
@@ -90,8 +79,8 @@ class Store(Base):
         super().display()
         super().display_options()
 
-    def __init__(self, target, admin):
-        super().__init__(target, admin)
+    def __init__(self, target, admin, character):
+        super().__init__(target, admin, character)
         self.money = target['money']
 
 
@@ -103,8 +92,8 @@ class Info(Base):
     def get_summary(self):
         return self.header
 
-    def __init__(self, target, admin):
-        super().__init__(target, admin)
+    def __init__(self, target, admin, character):
+        super().__init__(target, admin, character)
         self.header = target.get('header', target['flavor'])
 
 
@@ -136,8 +125,8 @@ class Item(Base):
     def get_display_fields(self):
         return {"flavor": "Name", "cost": "Cost (eb)"}
 
-    def __init__(self, target, admin):
-        super().__init__(target, admin)
+    def __init__(self, target, admin, character):
+        super().__init__(target, admin, character)
         with open('items.csv') as items_file:
             for line in items_file.readlines()[1:]:
                 item_description = line.rstrip().split('\t')
@@ -148,8 +137,8 @@ class Item(Base):
 
 
 class Gear(Item):
-    def __init__(self, target, admin):
-        super().__init__(target, admin)
+    def __init__(self, target, admin, character):
+        super().__init__(target, admin, character)
 
     def get_type_name(self):
         return "Gear"
@@ -163,11 +152,13 @@ class Gear(Item):
         update_character(self.character, "gear", [
             self.flavor, self.cost, self.weight])
 
+
 class Armor(Item):
     def get_type_name(self):
         return "Armor"
 
-    def __init__(self, target, admin):
+    def __init__(self, target, admin, character):
+        super().__init__(target, admin, character)
         with open('armor.csv') as armor_file:
             for line in armor_file.readlines()[1:]:
                 armor_description = line.rstrip().split('\t')
@@ -178,6 +169,7 @@ class Armor(Item):
                     self.ev = armor_description[3]
                     self.cost = armor_description[4]
                     break
+
     def get_display_fields(self):
         fields = super().get_display_fields()
         fields.update({
@@ -186,12 +178,14 @@ class Armor(Item):
             "ev": "Encumberance"
         })
         return fields
+
+
 class Weapon(Item):
     def get_type_name(self):
         return "Weapons"
 
-    def __init__(self, target, admin):
-        super().__init__(target, admin)
+    def __init__(self, target, admin, character):
+        super().__init__(target, admin, character)
         with open('weapons.csv') as weapons_file:
             for line in weapons_file.readlines()[1:]:
                 weapon_description = line.rstrip().split('\t')

@@ -1,7 +1,7 @@
 from src.router import connect
 from click.testing import CliRunner
 
-weyland_return = """Welcome to [32mWeyland Yutani Refreshments[0m, please select a purchase
+weyland_return = """Welcome to Weyland Yutani Refreshments, please select a purchase
 Gear
   Item #  Name       Cost (eb)    Weight (kg)
 --------  -------  -----------  -------------

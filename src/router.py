@@ -10,18 +10,20 @@ import random
 from src import SERVICE, SHEET_ID
 from src.displayclasses import Base
 from src.sheetio import query_character, update_character, get_weapon_from_character, deal_damage, get_wound_status
-from colorama import Fore, Back, Style
 
 
 @click.group()
-def route():
+@click.option('--character', default=getpass.getuser())
+@click.pass_context
+def route(ctx, character):
+    ctx.obj = character
     pass
 
 
 @route.command()
 @click.argument('character')
 @click.argument('property')
-def qc(character, property):
+def qc(call_char, character, property):
     results = query_character(character, property)[1]
     for result in results:
         print(f'{character} has {result} {property}')
@@ -38,7 +40,8 @@ def uc(character, property, value):
 @route.command()
 @click.argument('target')
 @click.option('--auth', default=None)
-def connect(target, auth):
+@click.pass_obj
+def connect(character, target, auth):
     file = [file for file in os.listdir(
         './flavor_text') if target.lower() in file.lower()]
     if len(file) > 0:
@@ -50,11 +53,12 @@ def connect(target, auth):
         target = json.load(target)
         admin = 'access_code' in target.keys(
         ) and auth == target['access_code']
-        Base(target, admin).get_type().display()
+        Base(target, admin, character).get_type().display()
 
 
 @route.group()
-def roll():
+@click.pass_context
+def roll(ctx):
     pass
 
 
@@ -62,23 +66,26 @@ def roll():
 @click.option('--stat', default=None)
 @click.option('--D', default=10, type=click.INT)
 @click.option('--skill', default='')
-def skillcheck(stat, d, skill):
-    msg = base_roll([stat], d, skill)
+@click.pass_obj
+def skillcheck(character, stat, d, skill):
+    msg = base_roll([stat], d, skill, character)
     print(msg)
     os.system(f'wall "{msg}"')
 
 
 @roll.command()
-def facedown():
-    msg = base_roll(['cool', 'rep'], 10, None)
+@click.pass_obj
+def facedown(character):
+    msg = base_roll(['cool', 'rep'], 10, None, character)
     print('This is the final facedown!')
     print(msg)
     os.system(f'wall "{msg}"')
 
 
 @roll.command()
-def initiative():
-    msg = 'Rolling for initiative: ' + base_roll(['REF'], 10, None) + '\n'
+@click.pass_obj
+def initiative(character):
+    msg = 'Rolling for initiative: ' + base_roll(['REF'], 10, None, character) + '\n'
     msg += 'Special case: if a QUICK DRAW is declared, add 3 to intiative roll' \
         ' and take 3 extra damage in the current combat round.'
     print(msg)
@@ -86,10 +93,11 @@ def initiative():
 
 
 @roll.command()
-@click.option('--target', type=click.Choice(['head', 'torso', 'right arm', 'left arm', 'right leg', 'left leg']), default=None)
 @click.argument('weapon_name')
 @click.argument('opponent')
-def attack(weapon_name, opponent, target):
+@click.option('--target', type=click.Choice(['head', 'torso', 'right arm', 'left arm', 'right leg', 'left leg']), default=None)
+@click.pass_obj
+def attack(character, weapon_name, opponent, target):
     """
     :param weapon: Pick a weapon from your inventory to use in the 
         current combat round. Allowed values: Names of weapons you own.
@@ -98,7 +106,6 @@ def attack(weapon_name, opponent, target):
     # TODO: Make the docstring keep its formatting when
     # printed with --help
     # Get weapon stats
-    character = getpass.getuser()
     weapon = get_weapon_from_character(character, weapon_name)
 
     body_map = {
@@ -127,7 +134,7 @@ def attack(weapon_name, opponent, target):
 
     # Roll for damage
     # Assuming weapon.damage_ammo is always in the form of "XDY+Z (mm)"
-    damage_stat = weapon.damage_ammo.lower().split(' ')[0]
+    damage_stat = weapon.damage_ammo.lower().split('(')[0]
     if '+' in damage_stat:
         # XdY+Z
         roll, bonus = damage_stat.split('+')
@@ -162,15 +169,16 @@ def damage(character, new_damage):
 
 
 @roll.group()
+@click.pass_context
 def save():
     pass
 
 @save.command()
-def stun():
+@click.pass_obj
+def stun(character):
     """
     Roll a stun save
     """
-    character = getpass.getuser()
     bt = int(query_character(character, 'body')[1])
     wound_status = get_wound_status(character)
     roll = random.randrange(1, 11)
@@ -179,20 +187,19 @@ def stun():
     print(f'Stun save {status}: rolled {roll} vs body type ({bt}) - wound status ({wound_status})')
 
 @save.command()
-def death():
+@click.pass_obj
+def death(character):
     """
     Roll a death save
     """
-    character = getpass.getuser()
     bt = int(query_character(character, 'body')[1])
     wound_status = 0
     success = random.randrange(1, 11) < (bt - wound_status)
     print('Death save')
 
 
-def base_roll(stats, d, skill):
+def base_roll(stats, d, skill, character):
     result = random.randrange(1, d+1)
-    character = getpass.getuser()
     stat_results = {}
     for stat in stats:
         stat_results[stat] = query_character(character, stat)[1]
@@ -206,5 +213,5 @@ def base_roll(stats, d, skill):
         skill_notification = f' + {skill_modifier} ({skill})]'
     total = int(result) + sum([int(v)
                                for v in stat_results.values()]) + int(skill_modifier)
-    message = f"{character} rolled a {Fore.GREEN}{total}!{Style.RESET_ALL} [{result} (roll) + {stat_notification}{skill_notification}"
+    message = f"{character} rolled a {total}! [{result} (roll) + {stat_notification}{skill_notification}"
     return message
