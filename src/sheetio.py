@@ -1,6 +1,22 @@
 from src import SERVICE, SHEET_ID
 import json
 
+def disconnect_character(character):
+    c = {}
+    with open('connections.json') as conn:
+        c = json.load(conn)
+        c.pop(character)
+    with open('connections.json', 'w') as conn:
+        json.dump(c, conn)
+
+def connect_character(character, target):
+    c = {}
+    with open('connections.json') as conn:
+        c = json.load(conn)
+        c[character] = target
+    with open('connections.json', 'w') as conn:
+        json.dump(c, conn)
+
 
 def find_skill(skill_table, skill, starting_cell):
     skill_row = None

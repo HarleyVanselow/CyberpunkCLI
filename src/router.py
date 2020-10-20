@@ -9,7 +9,7 @@ import getpass
 import random
 from src import SERVICE, SHEET_ID
 from src.displayclasses import Base
-from src.sheetio import query_character, update_character, get_weapon_from_character, deal_damage, get_wound_status
+from src.sheetio import query_character, update_character, get_weapon_from_character, deal_damage, get_wound_status, connect_character
 
 
 @click.group()
@@ -19,6 +19,10 @@ def route(ctx, character):
     ctx.obj = character
     pass
 
+@route.command()
+@click.pass_obj
+def test(character):
+    print(f"EDIT{character}")
 
 @route.command()
 @click.argument('character')
@@ -40,8 +44,9 @@ def uc(character, property, value):
 @route.command()
 @click.argument('target')
 @click.option('--auth', default=None)
+@click.option('--cmds', default='')
 @click.pass_obj
-def connect(character, target, auth):
+def connect(character, target, auth, cmds):
     file = [file for file in os.listdir(
         './flavor_text') if target.lower() in file.lower()]
     if len(file) > 0:
@@ -49,11 +54,12 @@ def connect(character, target, auth):
     else:
         print(f'No target matching request "{target}"')
         return
+    connect_character(character, target)
     with open(f'./flavor_text/{target}') as target:
         target = json.load(target)
         admin = 'access_code' in target.keys(
         ) and auth == target['access_code']
-        Base(target, admin, character).get_type().display()
+        Base(target, admin, character, cmds=cmds).get_type().display()
 
 
 @route.group()

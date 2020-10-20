@@ -2,15 +2,16 @@ from colorama import Fore, Back, Style
 from tabulate import tabulate
 import click
 import getpass
-from src.sheetio import query_character, update_character
+from src.sheetio import query_character, update_character, disconnect_character
 
 
 class Base:
     def display(self):
-        if self.admin_flavor != '' and self.admin:
-            print(self.admin_flavor)
-        else:
-            print(self.flavor)
+        if not self.options or self.cmds == '':
+            if self.admin_flavor != '' and self.admin:
+                print(self.admin_flavor)
+            else:
+                print(self.flavor)
 
     def get_summary(self):
         return self.flavor
@@ -20,10 +21,9 @@ class Base:
 
     def display_options(self, to_display=[]):
         if self.options:
-            user_done = False
-            while not user_done:
-                options = [Base(option, self.admin, self.character).get_type()
-                           for option in self.options]
+            options = [Base(option, self.admin, self.character).get_type()
+                       for option in self.options]
+            if self.cmds == '':
                 if isinstance(options[0], Item):
                     tables = {}
                     headers = ['Item #']
@@ -38,19 +38,22 @@ class Base:
                     for item_type in tables.keys():
                         print(item_type)
                         print(tabulate(tables[item_type]['table'],
-                                       headers=tables[item_type]['headers']))
+                                    headers=tables[item_type]['headers']))
                 elif isinstance(options[0], Info):
                     for i, option in enumerate(options):
                         print(f"{i+1}) {option.get_summary()}")
                 print('Or q to quit')
-                choice = click.prompt('')
-                if choice == 'q':
-                    return
-                Base(self.options[int(choice)-1],
-                     self.admin, self.character).get_type().display()
-                user_done = click.confirm('Exit?')
+                return
+            choice = self.cmds.split(':')[0]
+            self.cmds = self.cmds[1:]
+            if choice == 'q':
+                disconnect_character(self.character)
+                print('Goodbye')
+                return
+            Base(self.options[int(choice)-1],
+                 self.admin, self.character, cmds=self.cmds).get_type().display()
 
-    def __init__(self, target, admin, character):
+    def __init__(self, target, admin, character, cmds=''):
         self.type = target['type']
         self.target = target
         self.flavor = target['flavor']
@@ -58,12 +61,13 @@ class Base:
         self.options = target.get('options', [])
         self.admin = admin
         self.character = character
+        self.cmds = cmds
 
     def get_type(self):
         if self.type == 'store':
-            return Store(self.target, self.admin, self.character)
+            return Store(self.target, self.admin, self.character, cmds=self.cmds)
         elif self.type == 'info':
-            return Info(self.target, self.admin, self.character)
+            return Info(self.target, self.admin, self.character, cmds=self.cmds)
         elif self.type == 'item':
             return Item(self.target, self.admin, self.character)
         elif self.type == "weapon":
@@ -79,8 +83,8 @@ class Store(Base):
         super().display()
         super().display_options()
 
-    def __init__(self, target, admin, character):
-        super().__init__(target, admin, character)
+    def __init__(self, target, admin, character, cmds=''):
+        super().__init__(target, admin, character, cmds=cmds)
         self.money = target['money']
 
 
@@ -92,8 +96,8 @@ class Info(Base):
     def get_summary(self):
         return self.header
 
-    def __init__(self, target, admin, character):
-        super().__init__(target, admin, character)
+    def __init__(self, target, admin, character,  cmds=''):
+        super().__init__(target, admin, character, cmds=cmds)
         self.header = target.get('header', target['flavor'])
 
 
