@@ -41,5 +41,4 @@ class MyClient(discord.Client):
                 await message.channel.send(m)
 
 client = MyClient()
-with open('credentials.json') as cred:
-    client.run(json.load(cred)['discord_token'])
+client.run(os.environ['DISCORD_TOKEN'])
