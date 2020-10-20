@@ -35,6 +35,6 @@ jobs:
       env:
         DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
         SHEET_ID: ${{ secrets.DISCORD_TOKEN }}
-        SHEETS_ACCOUNT: ${{ secrets.SHEETS_ACCOUNT }}
+        SHEET_ACCOUNT: ${{ secrets.SHEETS_ACCOUNT }}
       run: |
         pytest
