@@ -1,4 +1,4 @@
-https://github.com/HarleyVanselow/CyberpunkCLI/workflows/Python%20application/badge.svg
+![Build Status](https://github.com/HarleyVanselow/CyberpunkCLI/workflows/Build/badge.svg)
 
 <h1>Welcome to CyberpunkCLI</h1>
 
