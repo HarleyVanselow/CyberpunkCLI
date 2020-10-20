@@ -2,3 +2,5 @@ colorama
 google-api-python-client
 click
 tabulate
+pytest-mock
+discord

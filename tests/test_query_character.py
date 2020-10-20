@@ -1,15 +1,9 @@
 from src.router import query_character, get_weapon_from_character
 from src.displayclasses import Weapon
+import os
 
-
-def test_query_character():
-    assert ('B22', '8', 'Charismatic Leadership') == query_character(
-        'harley', 'charisma')
-    assert (None, '0', 'cowardice') == query_character('harley', 'cowardice')
-    assert ('B7', '5', 'int') == query_character('harley', 'int')
-
-def test_get_weapon_from_character():
-    weapon = {'flavor': 'Federated Arms Impact',
+skill_map=[['SPECIAL ABILITIES', '', 'INT', '', 'REF', '', 'TECH'], ['Authority', '', 'Accounting', '', 'Archery', '', 'Aero Tech (2)'], ['Charismatic Leadership', '8', 'Anthropology', '', 'Athletics', '', 'AV Tech (3)'], ['Combat Sense', '', 'Awareness/Notice', '', 'Brawling', '', 'Basic Tech (2)'], ['Credibility', '', 'Biology', '', 'Dance', '', 'Cryotank Operation'], ['Family', '', 'Botany', '', 'Dodge & Escape', '', 'Cyberdeck Design (2)'], ['Interface', '', 'Chemistry', '', 'Driving', '', 'Cyber Tech (2)'], ['Jury Rig', '', 'Composition', '', 'Fencing', '', 'Demolitions (2)'], ['Medical Tech', '', 'Diagnose Illness', '', 'Handgun', '', 'Disguise'], ['Resources', '', 'Education & Gen Know', '', 'Heavy Weapons', '', 'Electronics'], ['Streetdeal', '', 'Expert', '', 'Martial Art 1', '', 'Elect. Security (2)'], ['ATTR', '', 'Gamble', '', 'Martial Art 2', '', 'First Aid'], ['Personal Grooming', '', 'Geology', '', 'Martial Art 3', '', 'Forgery'], ['Wardrobe & Style', '', 'Hide/Evade', '', 'Melee', '', 'Gyro Tech (3)']]
+weapon = {'flavor': 'Federated Arms Impact',
               'weapon_type': 'P',
               'accuracy': '+1',
               'con': 'J',
@@ -20,6 +14,32 @@ def test_get_weapon_from_character():
               'rel': 'VR',
               'range': '50m',
               'cost': '60'}
-    from_index = get_weapon_from_character('harley','Impact').__dict__
+def mock_query_sheet(**query):
+    assert query['spreadsheetId'] == os.getenv('SHEET_ID')
+    if query['range'] == 'harley!B22':
+        return {"values":[['8']]}
+    elif query['range'] == 'harley!B7':
+        return {"values":[['5']]}
+    elif query['range'] == 'harley!A20:H51':
+        return {"values": skill_map}
+    elif query['range'] == 'harley!J55:T75':
+        return {"values": [list(weapon.values())]}
+    else:
+        return {}
+
+
+def test_query_character(mocker):
+    mocker.patch("src.sheetio.query_sheet", new=mock_query_sheet)
+
+    assert ('B22', '8', 'Charismatic Leadership') == query_character(
+        'harley', 'charisma')
+    assert (None, '0', 'cowardice') == query_character('harley', 'cowardice')
+    assert ('B7', '5', 'int') == query_character('harley', 'int')
+
+
+def test_get_weapon_from_character(mocker):
+    mocker.patch("src.sheetio.query_sheet", new=mock_query_sheet)
+    
+    from_index = get_weapon_from_character('harley', 'Impact').__dict__
     for item in weapon.items():
         assert item in from_index.items()

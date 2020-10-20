@@ -103,6 +103,15 @@ def deal_damage(character, new_damage):
     ]
     update_character(character, 'wounds', update_vals)
 
+def query_sheet(**kwargs):
+    # pylint: disable=maybe-no-member
+    sheet = SERVICE.spreadsheets()
+    return sheet.values().get(**kwargs).execute()
+
+def update_sheet(**kwargs):
+    # pylint: disable=maybe-no-member
+    sheet = SERVICE.spreadsheets()
+    return sheet.values().update(**kwargs).execute()
 
 def query_character(character, property):
     """Gets a stat value from a character sheet
@@ -123,10 +132,8 @@ def query_character(character, property):
             query = cell_map['skills']
         else:
             query = cell_map[property.lower()]
-        # pylint: disable=maybe-no-member
-        sheet = SERVICE.spreadsheets()
-        result = sheet.values().get(spreadsheetId=SHEET_ID,
-                                    range=f'{character}!{query}').execute()
+        result = query_sheet(spreadsheetId=SHEET_ID,
+                                    range=f'{character}!{query}')
         if 'values' in result:
             return_val = result['values']
             if len(return_val) == 1 and len(return_val[0]) == 1 and ":" not in query:
@@ -167,11 +174,9 @@ def update_character(character, property, value):
         else:
             v = [value]
         body = {'values': v}
-        # pylint: disable=maybe-no-member
-        sheet = SERVICE.spreadsheets()
-        sheet.values().update(
+        update_sheet(
             spreadsheetId=SHEET_ID,
             range=f'{character}!{query}',
             valueInputOption='USER_ENTERED',
             body=body
-        ).execute()
+        )
