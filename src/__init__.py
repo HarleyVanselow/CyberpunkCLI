@@ -9,3 +9,4 @@ account = json.loads(os.getenv('SHEET_ACCOUNT'))
 credentials = service_account.Credentials.from_service_account_info(
     account, scopes=scopes)
 SERVICE = discovery.build('sheets', 'v4', credentials=credentials)
+TABLE = None

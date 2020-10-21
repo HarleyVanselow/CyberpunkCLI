@@ -5,6 +5,7 @@ from src.router import route
 from click.testing import CliRunner
 import shlex
 import time
+from discord import DMChannel
 client = discord.Client()
 
 
@@ -34,7 +35,7 @@ class MyClient(discord.Client):
             runner = CliRunner()
             print(args)
             m = runner.invoke(route, args).output
-            if connected:
+            if connected and not isinstance(message.channel, DMChannel):
                 await message.delete()
                 m = ">>>" + m
             if m != "":

@@ -1,7 +1,6 @@
-from src import SERVICE, SHEET_ID
+from src import SERVICE, SHEET_ID, TABLE
 import json
 import math
-
 def disconnect_character(character):
     c = {}
     with open('connections.json') as conn:
@@ -105,9 +104,34 @@ def deal_damage(character, new_damage):
     update_character(character, 'wounds', update_vals)
 
 def query_sheet(**kwargs):
+    global TABLE
     # pylint: disable=maybe-no-member
-    sheet = SERVICE.spreadsheets()
-    return sheet.values().get(**kwargs).execute()
+    split = kwargs['range'].split("!")
+    character = split[0]
+    query = split[1]
+    def get_cells(name):
+        col = ord(name[0]) - 65
+        row = int(name[1:])-1
+        return row,col
+    if TABLE is None:
+        sheet = SERVICE.spreadsheets()
+        sheet_id = kwargs['spreadsheetId']
+        TABLE = sheet.values().get(spreadsheetId=sheet_id,range=character).execute()['values']
+    query = query.split(':')
+    if len(query) == 1:
+        # Single cell
+        row,col = get_cells(query[0])
+        try:
+            return {"values":[[TABLE[row][col]]]}
+        except IndexError as e:
+            return {}
+    else:
+        # Range
+        start_cell = query[0]
+        end_cell = query[1]
+        start_row,start_col = get_cells(start_cell)
+        end_row,end_col = get_cells(end_cell)
+        return {"values":[[v for i,v in enumerate(row) if i>=start_col and i<=end_col] for i,row in enumerate(TABLE) if i>=start_row and i<=end_row]}
 
 def update_sheet(**kwargs):
     # pylint: disable=maybe-no-member
@@ -171,7 +195,7 @@ def update_character(character, property, value):
             query = cell_map[property]
         if property in range_list:
             # First find next empty row
-            existing = query_character(character, property)
+            existing = query_character(character, property)[1]
             starting_cell = query.split(":")[0]
             if existing is None:
                 query = starting_cell

@@ -37,8 +37,10 @@ class Base:
                             [i+1]+[option.get_properties()[p] for p in option.get_display_fields().keys()])
                     for item_type in tables.keys():
                         print(item_type)
+                        print('```')
                         print(tabulate(tables[item_type]['table'],
-                                    headers=tables[item_type]['headers']))
+                                    headers=tables[item_type]['headers'], tablefmt="grid"))
+                        print('```')
                 elif isinstance(options[0], Info):
                     for i, option in enumerate(options):
                         print(f"{i+1}) {option.get_summary()}")
