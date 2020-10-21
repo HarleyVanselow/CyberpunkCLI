@@ -76,7 +76,6 @@ def roll(ctx):
 def skillcheck(character, stat, d, skill):
     msg = base_roll([stat], d, skill, character)
     print(msg)
-    os.system(f'wall "{msg}"')
 
 
 @roll.command()
@@ -85,7 +84,6 @@ def facedown(character):
     msg = base_roll(['cool', 'rep'], 10, None, character)
     print('This is the final facedown!')
     print(msg)
-    os.system(f'wall "{msg}"')
 
 
 @roll.command()
@@ -95,7 +93,6 @@ def initiative(character):
     msg += 'Special case: if a QUICK DRAW is declared, add 3 to intiative roll' \
         ' and take 3 extra damage in the current combat round.'
     print(msg)
-    os.system(f'wall "{msg}"')
 
 
 @roll.command()
@@ -155,9 +152,13 @@ def attack(character, weapon_name, opponent, target):
     # Compute final damage on opponent
     if sp:
         damage -= int(sp)
-    if btm:
+    # Body type modifier can't reduce damage below 1
+    if btm and damage > 1:
         damage -= int(btm)
-
+        if damage <= 0:
+            damage = 1
+    if loc == 'head':
+        damage = damage * 2
     # Update opponent's wounds
     msg += "Total damage is %d" % damage
     print(msg)
@@ -190,7 +191,7 @@ def stun(character):
     roll = random.randrange(1, 11)
     success = roll < (bt - wound_status)
     status = 'succeeded' if success else 'failed'
-    print(f'Stun save {status}: rolled {roll} vs body type ({bt}) - wound status ({wound_status})')
+    print(f'Stun save {status}: rolled {roll} vs {bt - wound_status} [body type ({bt}) - wound status ({wound_status})]')
 
 @save.command()
 @click.pass_obj
@@ -200,8 +201,10 @@ def death(character):
     """
     bt = int(query_character(character, 'body')[1])
     wound_status = 0
-    success = random.randrange(1, 11) < (bt - wound_status)
-    print('Death save')
+    roll = random.randrange(1, 11)
+    success = roll < (bt - wound_status + 3)
+    status = 'succeeded' if success else 'failed'
+    print(f'Death save {status}: rolled {roll} vs {bt - wound_status + 3} [body type ({bt}) - wound status ({wound_status + 3})]')
 
 
 def base_roll(stats, d, skill, character):

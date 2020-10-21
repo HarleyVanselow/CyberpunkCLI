@@ -1,5 +1,6 @@
 from src import SERVICE, SHEET_ID
 import json
+import math
 
 def disconnect_character(character):
     c = {}
@@ -125,23 +126,39 @@ def query_character(character, property):
         the value itself, and the full name of the relevant attribute or skill
     """
     with open('sheet_map.json') as sheet_map:
+        property = property.lower()
         cell_map = json.load(sheet_map)
-        is_skill = property.lower() not in cell_map.keys()
+        is_skill = property not in cell_map.keys()
         if is_skill:
             # assume its a skill
             query = cell_map['skills']
         else:
-            query = cell_map[property.lower()]
+            query = cell_map[property]
+        # These results are affected by wound status
+            
         result = query_sheet(spreadsheetId=SHEET_ID,
                                     range=f'{character}!{query}')
+            
         if 'values' in result:
             return_val = result['values']
             if len(return_val) == 1 and len(return_val[0]) == 1 and ":" not in query:
                 return_val = result['values'][0][0]
+                if property in ['ref','int','cool']:
+                    wound_status = get_wound_status(character)
+                    return_val = apply_wound_effects(property, wound_status, return_val)
             return find_skill(result['values'], property, query.split(':')[0]) if is_skill else (query, return_val, property)
         else:
             return (query, None, property)
 
+def apply_wound_effects(stat, wound_status, starting_val):
+    if stat == 'ref' and wound_status == 2:
+        return int(starting_val) - 2
+    elif wound_status == 3:
+        return math.ceil(int(starting_val)/2)
+    elif wound_status > 3:
+        return math.ceil(int(starting_val)/3)
+    else:
+        return starting_val
 
 def update_character(character, property, value):
     with open('sheet_map.json') as sheet_map:
