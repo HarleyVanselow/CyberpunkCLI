@@ -192,6 +192,7 @@ class Weapon(Item):
 
     def __init__(self, target, admin, character):
         super().__init__(target, admin, character)
+        found = False
         with open('weapons.csv') as weapons_file:
             for line in weapons_file.readlines()[1:]:
                 weapon_description = line.rstrip().split('\t')
@@ -207,7 +208,10 @@ class Weapon(Item):
                     self.rel = weapon_description[8]
                     self.range = weapon_description[9]
                     self.cost = weapon_description[10]
+                    found = True
                     break
+            if not found:
+                raise Exception(f"Could not find {target['flavor']} in weapons index")
 
     def get_display_fields(self):
         fields = super().get_display_fields()

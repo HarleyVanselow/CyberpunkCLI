@@ -19,10 +19,12 @@ def route(ctx, character):
     ctx.obj = character
     pass
 
+
 @route.command()
 @click.pass_obj
 def test(character):
     print(f"EDIT{character}")
+
 
 @route.command()
 @click.argument('character')
@@ -89,18 +91,63 @@ def facedown(character):
 @roll.command()
 @click.pass_obj
 def initiative(character):
-    msg = 'Rolling for initiative: ' + base_roll(['REF'], 10, None, character) + '\n'
+    msg = 'Rolling for initiative: ' + \
+        base_roll(['REF'], 10, None, character) + '\n'
     msg += 'Special case: if a QUICK DRAW is declared, add 3 to intiative roll' \
         ' and take 3 extra damage in the current combat round.'
     print(msg)
 
 
+def get_weapon_skill(weapon, character):
+    skill = 0
+    if weapon.weapon_type.lower() == 'hvy':
+        skill = query_character(character, 'Heavy Weapons')[1]
+    elif weapon.weapon_type.lower() == 'p':
+        skill = query_character(character, 'Handguns')[1]
+    elif weapon.weapon_type.lower() == 'smg':
+        skill = query_character(character, 'Submachinegun')[1]
+    elif weapon.weapon_type.lower() == 'rif' or weapon.weapon_type.lower() == 'sht':
+        skill = query_character(character, 'Rifle')[1]
+    return int(skill)
+
+
+def get_hit_number(weapon, range):
+    point_blank = 10
+    close = 15
+    medium = 20
+    long = 25
+    extreme = 30
+    w_range = int(weapon.range.split('m')[0])
+    if range < round(w_range/4):
+        return point_blank
+    elif round(w_range/2) > range >= round(w_range/4):
+        return close
+    elif w_range > range >= round(w_range/2):
+        return medium
+    elif w_range*2 > range >= w_range:
+        return long
+    else:
+        return extreme
+
+
+def check_hit(weapon, range, character, modifier):
+    roll = random.randrange(1, 11)
+    ref = int(query_character(character, 'ref')[1])
+    weapon_skill = get_weapon_skill(weapon, character)
+    hit_number = get_hit_number(weapon, range)
+    success = (roll + ref + weapon_skill + modifier) >= hit_number
+    print(f"{character} {'hit' if success else 'missed'} (Rolled {roll} + REF {ref} + skill {weapon_skill} with {modifier} vs {hit_number})")
+    return success
+
+
 @roll.command()
 @click.argument('weapon_name')
 @click.argument('opponent')
+@click.argument('distance')
+@click.option('--modifiers', default='')
 @click.option('--target', type=click.Choice(['head', 'torso', 'right arm', 'left arm', 'right leg', 'left leg']), default=None)
 @click.pass_obj
-def attack(character, weapon_name, opponent, target):
+def attack(character, weapon_name, opponent, distance, modifiers, target):
     """
     :param weapon: Pick a weapon from your inventory to use in the 
         current combat round. Allowed values: Names of weapons you own.
@@ -110,7 +157,8 @@ def attack(character, weapon_name, opponent, target):
     # printed with --help
     # Get weapon stats
     weapon = get_weapon_from_character(character, weapon_name)
-
+    modifier = 0 if modifiers == '' else sum(
+        [int(m) for m in modifiers.split(',')])
     body_map = {
         "head": [1],
         "toro": [2, 3, 4],
@@ -119,6 +167,9 @@ def attack(character, weapon_name, opponent, target):
         "right leg": [7, 8],
         "left leg": [9, 10]
     }
+
+    if not check_hit(weapon, int(distance), character, modifier):
+        return
 
     if target is None:
         # Roll for hit location
@@ -130,10 +181,10 @@ def attack(character, weapon_name, opponent, target):
         loc = target
         damage = -4
     # Get opponent's SP based on location
-    query, sp, name = query_character(opponent, loc)
+    sp = query_character(opponent, loc)[1]
 
     # Get opponent's body type
-    query, btm, name = query_character(opponent, 'btm')
+    btm = query_character(opponent, 'btm')[1]
 
     # Roll for damage
     # Assuming weapon.damage_ammo is always in the form of "XDY+Z (mm)"
@@ -153,15 +204,21 @@ def attack(character, weapon_name, opponent, target):
     if sp:
         damage -= int(sp)
     # Body type modifier can't reduce damage below 1
+    if loc == 'head':
+        damage = damage * 2
     if btm and damage > 1:
         damage -= int(btm)
         if damage <= 0:
             damage = 1
-    if loc == 'head':
-        damage = damage * 2
     # Update opponent's wounds
     msg += "Total damage is %d" % damage
+    if damage >= 8:
+        msg += f". {opponent}'s {loc} is mangled beyond recognition"
+        death_save(opponent, 3)
+        if loc == 'head':
+            msg += f". {opponent}'s head explodes in a pulpy mess"
     print(msg)
+    deal_damage(opponent, damage)
 
 
 @roll.command()
@@ -180,6 +237,7 @@ def damage(character, new_damage):
 def save(ctx):
     pass
 
+
 @save.command()
 @click.pass_obj
 def stun(character):
@@ -191,20 +249,27 @@ def stun(character):
     roll = random.randrange(1, 11)
     success = roll < (bt - wound_status)
     status = 'succeeded' if success else 'failed'
-    print(f'Stun save {status}: rolled {roll} vs {bt - wound_status} [body type ({bt}) - wound status ({wound_status})]')
+    print(
+        f'Stun save {status}: rolled {roll} vs {bt - wound_status} [body type ({bt}) - wound status ({wound_status})]')
+
 
 @save.command()
 @click.pass_obj
 def death(character):
+    death_save(character)
+
+
+def death_save(character, ws=None):
     """
     Roll a death save
     """
     bt = int(query_character(character, 'body')[1])
-    wound_status = 0
+    wound_status = get_wound_status(character) if ws is None else ws
     roll = random.randrange(1, 11)
     success = roll < (bt - wound_status + 3)
     status = 'succeeded' if success else 'failed'
-    print(f'Death save {status}: rolled {roll} vs {bt - wound_status + 3} [body type ({bt}) - wound status ({wound_status + 3})]')
+    print(
+        f'Death save {status}: rolled {roll} vs {bt - wound_status + 3} [body type ({bt}) - wound status ({wound_status + 3})]')
 
 
 def base_roll(stats, d, skill, character):

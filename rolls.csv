@@ -2,3 +2,4 @@ name,d,skills
 ambush,10,int,Stealth
 facedown,10,cool,rep
 initiative,10,ref
+stabilize,10,tech,first aid

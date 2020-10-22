@@ -34,7 +34,10 @@ class MyClient(discord.Client):
                     args += shlex.split(m)
             runner = CliRunner()
             print(args)
-            m = runner.invoke(route, args).output
+            try:
+                m = runner.invoke(route, args, catch_exceptions=False).output
+            except Exception as e:
+                m = e
             if connected and not isinstance(message.channel, DMChannel):
                 await message.delete()
                 m = ">>>" + m

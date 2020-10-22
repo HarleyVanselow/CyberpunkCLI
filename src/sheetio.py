@@ -49,7 +49,7 @@ def get_wound_status(character):
     wound_status = get_wound_values(character)
     for i,item in enumerate(wound_status.items()):
         if item[1] == 0:
-            return i - 1
+            return i - 1 if i > 0 else 0
 
 def get_wound_values(character):
     _, wounds_list, _ = query_character(character, 'wounds')
@@ -123,7 +123,7 @@ def query_sheet(**kwargs):
         row,col = get_cells(query[0])
         try:
             return {"values":[[TABLE[row][col]]]}
-        except IndexError as e:
+        except IndexError:
             return {}
     else:
         # Range
