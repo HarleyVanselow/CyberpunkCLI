@@ -87,7 +87,6 @@ def deal_damage(character, new_damage):
 
     cat_max = 4
     wound_values = get_wound_values(character)
-    print(wound_values)
     wounds_int = list(wound_values.values())
     categories = list(wound_values.keys())
 

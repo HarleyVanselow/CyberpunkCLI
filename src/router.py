@@ -156,13 +156,9 @@ def attack(character, weapon_name, opponent, distance, modifiers, target):
     # TODO: Make the docstring keep its formatting when
     # printed with --help
     # Get weapon stats
-    print("attacking")
     weapon = get_weapon_from_character(character, weapon_name)
-    print(weapon)
     modifier = 0 if modifiers == '' else sum(
         [int(m) for m in modifiers.split(',')])
-    if target is not None:
-        modifier -= 4
     body_map = {
         "head": [1],
         "torso": [2, 3, 4],
@@ -171,17 +167,16 @@ def attack(character, weapon_name, opponent, distance, modifiers, target):
         "right leg": [7, 8],
         "left leg": [9, 10]
     }
+    if target is None:
+        # Roll for hit location
+        loc = random.randrange(1, 11)
+        loc = [k for k, v in body_map.items() if loc in v][0]
+    else:
+        loc = target
 
     if not check_hit(weapon, int(distance), character, modifier):
         return
 
-    if target is None:
-        # Roll for hit location
-        loc = random.randrange(1, 11)
-    else:
-        loc = target
-    print(loc)
-    loc = [k for k, v in body_map.items() if loc in v][0]
     damage = 0
     msg = f"Hit {loc}. "
        
