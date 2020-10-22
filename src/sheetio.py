@@ -1,7 +1,7 @@
 from src import SERVICE, SHEET_ID, TABLE
 import json
 import math
-
+from tabulate import tabulate
 
 def disconnect_character(character):
     c = {}
@@ -83,7 +83,6 @@ def deal_damage(character, new_damage):
         be dealt to the character
     """
     new_damage = int(new_damage)
-    print("%d damage has been done to %s" % (new_damage, character))
 
     cat_max = 4
     wound_values = get_wound_values(character)
@@ -96,8 +95,11 @@ def deal_damage(character, new_damage):
         wounds_int[i] += bump
         new_damage -= bump
 
-    for i in range(len(categories)):
-        print(categories[i] + '  ' + 'x'*wounds_int[i])
+    print(f'{character} health:')
+    print('```')
+    print(tabulate(zip(categories,['x'*x for x in wounds_int]),tablefmt="grid"))
+    print('```')
+    
 
     wounds = [str(x) for x in wounds_int]
 
@@ -107,7 +109,6 @@ def deal_damage(character, new_damage):
         categories[5:],
         wounds[5:]
     ]
-    print(update_vals)
     update_character(character, 'wounds', update_vals)
 
 

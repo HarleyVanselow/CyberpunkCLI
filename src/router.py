@@ -135,8 +135,9 @@ def check_hit(weapon, range, character, modifier):
     ref = int(query_character(character, 'ref')[1])
     weapon_skill = get_weapon_skill(weapon, character)
     hit_number = get_hit_number(weapon, range)
-    success = (roll + ref + weapon_skill + modifier) >= hit_number
-    print(f"{character} {'hit' if success else 'missed'} (Rolled {roll} + REF {ref} + skill {weapon_skill} with {modifier} vs {hit_number})")
+    result = roll + ref + weapon_skill + modifier
+    success = result >= hit_number
+    print(f"{character} {'hit' if success else 'missed'} [Rolled {roll} + REF {ref} + skill {weapon_skill} with {'' if modifier<0 else '+'}{modifier} = {result} vs {hit_number}]")
     return success
 
 
@@ -173,12 +174,13 @@ def attack(character, weapon_name, opponent, distance, modifiers, target):
         loc = [k for k, v in body_map.items() if loc in v][0]
     else:
         loc = target
+        modifier -= 4
 
     if not check_hit(weapon, int(distance), character, modifier):
         return
 
     damage = 0
-    msg = f"Hit {loc}. "
+    msg = f"Hit {opponent}'s {loc}, dealing "
        
     # Get opponent's SP based on location
     sp = query_character(opponent, loc)[1]
@@ -199,26 +201,34 @@ def attack(character, weapon_name, opponent, distance, modifiers, target):
     times, d = [int(x) for x in roll.split('d')]
     for i in range(times):
         damage += random.randrange(1, d+1)
-
+    rolled = damage
     # Compute final damage on opponent
+    sp_msg = ''
+    head_msg = ''
+    btm_msg = ''
     if sp:
         damage -= int(sp)
+        sp_msg = f' - SP {sp}'
     # Body type modifier can't reduce damage below 1
-    if loc == 'head':
+    if loc == 'head' and damage > 0:
         damage = damage * 2
+        head_msg = ' x 2 (headshot)'
     if btm and damage > 1:
         damage -= int(btm)
+        btm_msg = f' - BTM {btm}'
         if damage <= 0:
             damage = 1
     # Update opponent's wounds
-    msg += "Total damage is %d" % damage
-    if damage >= 8:
-        msg += f". {opponent}'s {loc} is mangled beyond recognition"
-        death_save(opponent, 3)
-        if loc == 'head':
-            msg += f". {opponent}'s head explodes in a pulpy mess"
+    if damage < 0:
+        damage = 0
+    msg += f"{damage} damage [Rolled {rolled}{sp_msg}{head_msg}{btm_msg}]"
     print(msg)
-    print(f'Calling deal_damage with damage={damage}')
+    if damage >= 8:
+        if loc == 'head':
+            print(f"{opponent}'s head explodes in a pulpy mess")
+        else:
+            print(f"{opponent}'s {loc} is mangled beyond recognition")
+            death_save(opponent, 3)
     deal_damage(opponent, damage)
 
 
