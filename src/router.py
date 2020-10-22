@@ -103,7 +103,7 @@ def get_weapon_skill(weapon, character):
     if weapon.weapon_type.lower() == 'hvy':
         skill = query_character(character, 'Heavy Weapons')[1]
     elif weapon.weapon_type.lower() == 'p':
-        skill = query_character(character, 'Handguns')[1]
+        skill = query_character(character, 'Handgun')[1]
     elif weapon.weapon_type.lower() == 'smg':
         skill = query_character(character, 'Submachinegun')[1]
     elif weapon.weapon_type.lower() == 'rif' or weapon.weapon_type.lower() == 'sht':
@@ -161,7 +161,7 @@ def attack(character, weapon_name, opponent, distance, modifiers, target):
         [int(m) for m in modifiers.split(',')])
     body_map = {
         "head": [1],
-        "toro": [2, 3, 4],
+        "torso": [2, 3, 4],
         "right arm": [5],
         "left arm": [6],
         "right leg": [7, 8],
@@ -218,6 +218,7 @@ def attack(character, weapon_name, opponent, distance, modifiers, target):
         if loc == 'head':
             msg += f". {opponent}'s head explodes in a pulpy mess"
     print(msg)
+    print(f'Calling deal_damage with damage={damage}')
     deal_damage(opponent, damage)
 
 

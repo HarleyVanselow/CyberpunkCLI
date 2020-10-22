@@ -64,6 +64,7 @@ def get_wound_values(character):
         wounds = wounds_list[1] + wounds_list[3]
     else:
         raise ValueError("Incorrect wounds format in Google Sheets")
+
     wounds_int = [int(x) for x in wounds]
 
     while(len(wounds_int) < 10):
@@ -81,6 +82,7 @@ def deal_damage(character, new_damage):
 
     cat_max = 4
     wound_values = get_wound_values(character)
+    print(wound_values)
     wounds_int = list(wound_values.values())
     categories = list(wound_values.keys())
 
@@ -101,6 +103,7 @@ def deal_damage(character, new_damage):
         categories[5:],
         wounds[5:]
     ]
+    print(update_vals)
     update_character(character, 'wounds', update_vals)
 
 def query_sheet(**kwargs):
