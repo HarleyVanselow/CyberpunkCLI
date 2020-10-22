@@ -1,6 +1,8 @@
 from src import SERVICE, SHEET_ID, TABLE
 import json
 import math
+
+
 def disconnect_character(character):
     c = {}
     with open('connections.json') as conn:
@@ -8,6 +10,7 @@ def disconnect_character(character):
         c.pop(character)
     with open('connections.json', 'w') as conn:
         json.dump(c, conn)
+
 
 def connect_character(character, target):
     c = {}
@@ -42,14 +45,15 @@ def get_weapon_from_character(character, weapon_name):
     _, weapons, _ = query_character(character, 'weapon')
     for weapon in weapons:
         if weapon_name.lower() in weapon[0].lower():
-            return Weapon({'flavor':weapon[0], 'type':'weapon'}, None, character)
+            return Weapon({'flavor': weapon[0], 'type': 'weapon'}, None, character)
 
 
 def get_wound_status(character):
     wound_status = get_wound_values(character)
-    for i,item in enumerate(wound_status.items()):
+    for i, item in enumerate(wound_status.items()):
         if item[1] == 0:
             return i - 1 if i > 0 else 0
+
 
 def get_wound_values(character):
     _, wounds_list, _ = query_character(character, 'wounds')
@@ -69,7 +73,8 @@ def get_wound_values(character):
 
     while(len(wounds_int) < 10):
         wounds_int.append(0)
-    return dict(zip(categories,wounds_int))
+    return dict(zip(categories, wounds_int))
+
 
 def deal_damage(character, new_damage):
     """
@@ -106,40 +111,45 @@ def deal_damage(character, new_damage):
     print(update_vals)
     update_character(character, 'wounds', update_vals)
 
+
 def query_sheet(**kwargs):
     global TABLE
     # pylint: disable=maybe-no-member
     split = kwargs['range'].split("!")
     character = split[0]
     query = split[1]
+
     def get_cells(name):
         col = ord(name[0]) - 65
         row = int(name[1:])-1
-        return row,col
-    if TABLE is None:
+        return row, col
+    if character not in TABLE.keys():
         sheet = SERVICE.spreadsheets()
         sheet_id = kwargs['spreadsheetId']
-        TABLE = sheet.values().get(spreadsheetId=sheet_id,range=character).execute()['values']
+        TABLE[character] = sheet.values().get(
+            spreadsheetId=sheet_id, range=character).execute()['values']
     query = query.split(':')
     if len(query) == 1:
         # Single cell
-        row,col = get_cells(query[0])
+        row, col = get_cells(query[0])
         try:
-            return {"values":[[TABLE[row][col]]]}
+            return {"values": [[TABLE[character][row][col]]]}
         except IndexError:
             return {}
     else:
         # Range
         start_cell = query[0]
         end_cell = query[1]
-        start_row,start_col = get_cells(start_cell)
-        end_row,end_col = get_cells(end_cell)
-        return {"values":[[v for i,v in enumerate(row) if i>=start_col and i<=end_col] for i,row in enumerate(TABLE) if i>=start_row and i<=end_row]}
+        start_row, start_col = get_cells(start_cell)
+        end_row, end_col = get_cells(end_cell)
+        return {"values": [[v for i, v in enumerate(row) if i >= start_col and i <= end_col] for i, row in enumerate(TABLE[character]) if i >= start_row and i <= end_row]}
+
 
 def update_sheet(**kwargs):
     # pylint: disable=maybe-no-member
     sheet = SERVICE.spreadsheets()
     return sheet.values().update(**kwargs).execute()
+
 
 def query_character(character, property):
     """Gets a stat value from a character sheet
@@ -162,20 +172,22 @@ def query_character(character, property):
         else:
             query = cell_map[property]
         # These results are affected by wound status
-            
+
         result = query_sheet(spreadsheetId=SHEET_ID,
-                                    range=f'{character}!{query}')
-            
+                             range=f'{character}!{query}')
+
         if 'values' in result:
             return_val = result['values']
             if len(return_val) == 1 and len(return_val[0]) == 1 and ":" not in query:
                 return_val = result['values'][0][0]
-                if property in ['ref','int','cool']:
+                if property in ['ref', 'int', 'cool']:
                     wound_status = get_wound_status(character)
-                    return_val = apply_wound_effects(property, wound_status, return_val)
+                    return_val = apply_wound_effects(
+                        property, wound_status, return_val)
             return find_skill(result['values'], property, query.split(':')[0]) if is_skill else (query, return_val, property)
         else:
             return (query, None, property)
+
 
 def apply_wound_effects(stat, wound_status, starting_val):
     if stat == 'ref' and wound_status == 2:
@@ -186,6 +198,7 @@ def apply_wound_effects(stat, wound_status, starting_val):
         return math.ceil(int(starting_val)/3)
     else:
         return starting_val
+
 
 def update_character(character, property, value):
     with open('sheet_map.json') as sheet_map:
