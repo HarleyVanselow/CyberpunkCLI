@@ -39,7 +39,7 @@ class Base:
                         print(item_type)
                         print('```')
                         print(tabulate(tables[item_type]['table'],
-                                    headers=tables[item_type]['headers'], tablefmt="grid"))
+                                       headers=tables[item_type]['headers'], tablefmt="grid"))
                         print('```')
                 elif isinstance(options[0], Info):
                     for i, option in enumerate(options):
@@ -185,6 +185,10 @@ class Armor(Item):
         })
         return fields
 
+    def checkout_update(self):
+        update_character(self.character, "armor", [
+            self.flavor, self.covers, self. sp, self.ev, self.cost])
+
 
 class Weapon(Item):
     def get_type_name(self):
@@ -211,7 +215,8 @@ class Weapon(Item):
                     found = True
                     break
             if not found:
-                raise Exception(f"Could not find {target['flavor']} in weapons index")
+                raise Exception(
+                    f"Could not find {target['flavor']} in weapons index")
 
     def get_display_fields(self):
         fields = super().get_display_fields()

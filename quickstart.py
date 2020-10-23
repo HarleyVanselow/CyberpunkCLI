@@ -6,6 +6,7 @@ from click.testing import CliRunner
 import shlex
 import time
 from discord import DMChannel
+from src import TABLE
 client = discord.Client()
 
 
@@ -14,9 +15,7 @@ class MyClient(discord.Client):
         print('Logged on as {0}!'.format(self.user))
 
     async def on_message(self, message):
-        if message.author.name == client.user.name:
-            return
-        elif message.content.startswith("!cp"):
+        if message.content.startswith("!cp"):
             m = message.content.split('!cp ')[1]
             guild = client.guilds[0]
             member = await guild.fetch_member(message.author.id)
@@ -43,6 +42,7 @@ class MyClient(discord.Client):
                 m = ">>>" + m
             if m != "":
                 await message.channel.send(m)
+            TABLE = {}
 
 client = MyClient()
 client.run(os.environ['DISCORD_TOKEN'])

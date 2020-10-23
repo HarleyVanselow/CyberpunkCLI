@@ -1,3 +1,4 @@
+Name,Coverage,SP,EV,Cost
 Cloth Light Synthetic Leather	Torso Arms Legs 	0	-0	Varies
 SkinTight Armor Padding	Torso Arms Legs 	-1/3rd	Varies	1500+
 Synth Leather Jacket/Pants	Torso Arms/Legs 	4	-0	200/150
@@ -35,7 +36,7 @@ Gibson Denim Jacket	Torso Arms 	14	-0	150
 Uniware Armor Jacket	Torso Arms 	14	-0	200
 Militech M78 RPA Jacket	Torso Arms 	14	-1	300
 Eji Armored Jacket	Torso Arms 	14	-0	300
-Icon America Morplex Shirt	Torso 	(Arms)	14	-1
+Icon America Morplex Shirt	Torso (Arms)	14	-1
 Ballistex Marine Survival Vest	Torso 	14	(5)	-1/-4
 Gibson Battlegear Fatigues	Legs 	14	-0	125
 Marine Combat Wetsuit	Whole Body 	15	-0	SF
