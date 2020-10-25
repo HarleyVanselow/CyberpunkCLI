@@ -108,7 +108,10 @@ def get_weapon_skill(weapon, character):
         skill = query_character(character, 'Submachinegun')[1]
     elif weapon.weapon_type.lower() == 'rif' or weapon.weapon_type.lower() == 'sht':
         skill = query_character(character, 'Rifle')[1]
-    return int(skill)
+    if isinstance(skill, int):
+        return int(skill)
+    elif isinstance(skill, float):
+        return float(skill)
 
 
 def get_hit_number(weapon, range):

@@ -16,6 +16,14 @@
         {
             "type":"armor",
             "flavor":"Eji Armored"
+        },
+        {
+            "type": "weapon",
+            "flavor":"Militech Taser"
+        },
+        {
+            "type":"weapon",
+            "flavor":"Sternmeyer Stakeout 10"
         }
     ]
 }

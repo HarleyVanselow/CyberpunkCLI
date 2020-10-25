@@ -3,8 +3,11 @@ from click.testing import CliRunner
 import shlex
 runner = CliRunner()
 try:
-	result = runner.invoke(route, shlex.split('--character harley roll attack impact spitfyre 5 --target head --modifiers 2,-2,5'), catch_exceptions=False)
-	print(result.output)
+    # result = runner.invoke(route, shlex.split('--character Koeknee roll attack Colt spitfyre 5'), catch_exceptions=False)
+    # result = runner.invoke(route, shlex.split('--character Hubert roll facedown'), catch_exceptions=False)
+    result = runner.invoke(route, shlex.split('--character spitfyre roll attack Federated harley 5'), catch_exceptions=False)
+    # result = runner.invoke(route, shlex.split('--character Hubert connect Leather'), catch_exceptions=False)
+    print(result.output)
 except Exception as e:
 	print(e)
 
