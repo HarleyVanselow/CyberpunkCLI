@@ -4,3 +4,4 @@ click
 tabulate
 pytest-mock
 discord
+pytest-cov
