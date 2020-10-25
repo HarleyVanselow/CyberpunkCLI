@@ -123,7 +123,9 @@ def get_hit_number(weapon, range):
     long = 25
     extreme = 30
     w_range = int(weapon.range.split('m')[0])
-    if range < round(w_range/4):
+    if range < 0:
+        raise ValueError("Combat range must be positive")
+    elif range < round(w_range/4):
         return point_blank
     elif round(w_range/2) > range >= round(w_range/4):
         return close
