@@ -112,6 +112,8 @@ def get_weapon_skill(weapon, character):
         return int(skill)
     elif isinstance(skill, float):
         return float(skill)
+    else:
+        return 0
 
 
 def get_hit_number(weapon, range):

@@ -53,7 +53,7 @@ def get_wound_status(character):
     for i, item in enumerate(wound_status.items()):
         if item[1] == 0:
             return i - 1 if i > 0 else 0
-
+    return 8
 
 def get_wound_values(character):
     _, wounds_list, _ = query_character(character, 'wounds')
