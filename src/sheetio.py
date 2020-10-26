@@ -36,7 +36,8 @@ def find_skill(skill_table, skill, starting_cell):
     start_row = int(starting_cell[1:])
     cell = f'{chr(ord(start_col)+skill_col)}{start_row+skill_row}'
     val = skill_table[skill_row][skill_col] if len(
-        skill_table[skill_row]) > skill_col else 0
+        skill_table[skill_row]) > skill_col else '0'
+    val = '0' if val == '' else val
     return (cell, val, skill)
 
 
