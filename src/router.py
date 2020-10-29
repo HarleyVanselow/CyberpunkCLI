@@ -108,13 +108,7 @@ def get_weapon_skill(weapon, character):
         skill = query_character(character, 'Submachinegun')[1]
     elif weapon.weapon_type.lower() == 'rif' or weapon.weapon_type.lower() == 'sht':
         skill = query_character(character, 'Rifle')[1]
-    if isinstance(skill, int):
-        return int(skill)
-    elif isinstance(skill, float):
-        return float(skill)
-    else:
-        return 0
-
+    return int(float(skill))
 
 def get_hit_number(weapon, range):
     point_blank = 10
@@ -144,7 +138,7 @@ def check_hit(weapon, range, character, modifier):
     hit_number = get_hit_number(weapon, range)
     result = roll + ref + weapon_skill + modifier
     success = result >= hit_number
-    print(f"{character} {'hit' if success else 'missed'} [Rolled {roll} + REF {ref} + skill {weapon_skill} with {'' if modifier<0 else '+'}{modifier} = {result} vs {hit_number}]")
+    print(f"{character} {'hit' if success else 'missed'} with their {weapon.flavor} [Rolled {roll} + REF {ref} + skill {weapon_skill} with {'' if modifier<0 else '+'}{modifier} = {result} vs {hit_number}]")
     return success
 
 def check_melee_hit(character, opponent, skill, modifiers, attack):

@@ -38,8 +38,13 @@ class Base:
                     for item_type in tables.keys():
                         print(item_type)
                         print('```')
-                        print(tabulate(tables[item_type]['table'],
-                                       headers=tables[item_type]['headers'], tablefmt="grid"))
+                        headers = [x[0] for x in tables[item_type]['table']]
+                        headers = ['Stat'] + headers
+                        display = []
+                        for p in range(1,len(tables[item_type]['table'][0])):
+                            display.append([tables[item_type]['headers'][p]] + [x[p] for x in tables[item_type]['table']])
+                        print(tabulate(display,
+                                       headers=headers, tablefmt="grid"))
                         print('```')
                 elif isinstance(options[0], Info):
                     for i, option in enumerate(options):

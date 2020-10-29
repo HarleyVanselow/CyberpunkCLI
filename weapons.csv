@@ -557,8 +557,8 @@ Jitte	MEL	+0	L	C	2d6	-	-	-	1m	30	PAC
 Zhi Dao(thin sword)	MEL	+0	L	C	2d6*	-	-	-	1m	100-200	PAC
 Kusari-gama(sickle)	MEL	-1	L	C	2d6*/3d6	-	-	-	2m	100	PAC
 Wu Cha(thin spear)	MEL	-1	N	P	2d6*	3d6	-	-	-	2m	100	PAC
-Kendachi Monoknife	MEL	+1	P	P	2d6#	-	-	VR	1m	200	CP20
-Kendachi Monowhip	MEL	+0	J	P	2d6#	-	-	ST	1-3m	350	Chr2
+Kendachi Monoknife	MEL	+1	P	P	2d6	-	-	VR	1m	200	CP20
+Kendachi Monowhip	MEL	+0	J	P	2d6	-	-	ST	1-3m	350	Chr2
 IMI "Chainknife"	MEL	+0	J	P	2d6+1*	-	-	VR	1m	120	Chr2
 Flexible Rubber Baton	MEL	+0	J	C	2d6+1	-	-	-	1m	15	ET
 Sword	MEL	+0	N	C	2d6+2*	-	-	-	1m	20-200	CP20
@@ -578,8 +578,8 @@ Naginata	MEL	+0	N	P	3d6*	-	-	-	2m	100	CP20
 Arasaka Katana	MEL	+2	N	R	3d6*(Hard SP/2)	-	-	VR	1m	-	SW
 Kukri	MEL	+0	L	P	3d6*	-	-	-	1m	50-150	PAC
 Machete	MEL	+0	L	C	3d6*	-	-	VR	1m	30	NE
-Monosword Cane	MEL	+1	L	P	3d6#	-	-	VR	1m	255	SOF2
-Monowire	MEL	+0	P	R	3d6#	-	-	VR	1m	60/m	Chr2
+Monosword Cane	MEL	+1	L	P	3d6	-	-	VR	1m	255	SOF2
+Monowire	MEL	+0	P	R	3d6	-	-	VR	1m	60/m	Chr2
 Liu Chi Bang/Bo/6ft Stick	MEL	+1	L	C	3d6+2	-	-	-	2m	40	PAC
 San Jie Gun	MEL	+0	N	C	3d6+2	-	-	-	2m	50	PAC
 3/6	MEL	+0	N	C	3d6+2	-	-	VR	2/3m	150	PAC
@@ -587,10 +587,10 @@ Titanium Katana	MEL	+1	L	R	3d6+2*	-	-	VR	1m	2850	P1
 Qing Long Dao/Scimitar	MEL	-2	N	P	3d6+3*	-	-	-	1m	250	PAC
 Sledgehammer	MEL	-1	N	C	4d6	-	-	-	1m	20	CP20
 Chainsaw	MEL	-3	N	C	4d6*	-	-	-	2m	80	CP20
-Kendachi MonoNaginata	MEL	+0	N	R	4d6#	-	-	VR	2m	400	CP20
-Kendachi MonoKatana	MEL	+1	N	R	4d6#	-	-	VR	1m	600	CP20
+Kendachi MonoNaginata	MEL	+0	N	R	4d6	-	-	VR	2m	400	CP20
+Kendachi MonoKatana	MEL	+1	N	R	4d6	-	-	VR	1m	600	CP20
 Kendachi Powersword	MEL	+0	L	R	 Hx1/2)	-	-	ST	1m	860	Chr1
-Kendachi Mono-Two	MEL	+1	J/N	P/R	2d6#/4d6#	-	-	VR	1m	650/700	Chr1
+Kendachi Mono-Two	MEL	+1	J/N	P/R	2d6/4d6	-	-	VR	1m	650/700	Chr1
 ACPA	Punch		Punch	+0	-	-(STR/9)d10	-	2	-	1.2m	-	MM
 ACPA	Kick		Kick	-1	-	-(1.5xPunch)d10	-	2	-	1.2m	-	MM
 ACPA Crush HH +0 - -(Punch+1)d10 - 1 - 1m - MM
@@ -598,7 +598,7 @@ Climber Claws	MEL	+1	N	C	1d10*+Fist/Kick	-	2	VR	1.5m	1000	MM
 2 Handed Pointed	MEL	+0	N	C	3d6+Fist	1/2SP	1/4P	-	1	50%	5m	225	MM
 1 Handed Blunt	MEL	+0	N	E	4d6+Fist	-	1	15%	2m	200	MM
 1 Handed Blade	MEL	+1	N	E	4d6~+Fist	-	1	10%	2m	550	MM
-Mono PA Sword	MEL	+1	N	R	4d6#+Fist	-	1	30%	2m	2000	MM
+Mono PA Sword	MEL	+1	N	R	4d6+Fist	-	1	30%	2m	2000	MM
 2 Handed Blade	MEL	-1	N	C	6d6~+Fist	-	1	10%	3m	1000	MM
 2 Handed Blunt	MEL	-1	N	E	6d6+Fist	-	1	15%	3m	500	MM
 Large Power Saw	MEL	-2	N	P	8d6~(1/3SP)	-	1	VR	2m	1250	MM
