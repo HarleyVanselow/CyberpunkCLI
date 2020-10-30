@@ -27,8 +27,9 @@ class MyClient(discord.Client):
                 if character in connections.keys():
                     connected = True
                     connection = connections[character].split(":")
+                    auth = connection[1]
                     connection.append(m)
-                    args += ['connect', connection[0], '--cmds', ':'.join(connection[1:])]
+                    args += ['connect', connection[0], '--cmds', ':'.join(connection[2:]), '--auth', auth]
                 else:
                     args += shlex.split(m)
             runner = CliRunner()

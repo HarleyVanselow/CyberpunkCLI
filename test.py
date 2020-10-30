@@ -7,7 +7,7 @@ try:
     # result = runner.invoke(route, shlex.split('--character Koeknee roll attack Colt spitfyre 5'), catch_exceptions=False)
     # result = runner.invoke(route, shlex.split('--character Hubert roll facedown'), catch_exceptions=False)
     # result = runner.invoke(route, shlex.split('--character spitfyre roll attack Federated harley 5'), catch_exceptions=False)
-    result = runner.invoke(route, shlex.split('--character Fortuna connect weyland'), catch_exceptions=False)
+    result = runner.invoke(route, shlex.split('--character Fortuna connect Vince --cmds 1'), catch_exceptions=False)
     print(result.output)
 except Exception:
 	print(traceback.format_exc())

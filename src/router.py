@@ -56,11 +56,12 @@ def connect(character, target, auth, cmds):
     else:
         print(f'No target matching request "{target}"')
         return
-    connect_character(character, target)
+    filename = target
     with open(f'./flavor_text/{target}') as target:
         target = json.load(target)
         admin = 'access_code' in target.keys(
         ) and auth == target['access_code']
+        connect_character(character, filename, target['access_code'] if admin else '')
         Base(target, admin, character, cmds=cmds).get_type().display()
 
 

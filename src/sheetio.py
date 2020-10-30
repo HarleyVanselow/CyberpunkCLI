@@ -12,11 +12,11 @@ def disconnect_character(character):
         json.dump(c, conn)
 
 
-def connect_character(character, target):
+def connect_character(character, target,pw):
     c = {}
     with open('connections.json') as conn:
         c = json.load(conn)
-        c[character] = target
+        c[character] = target+':'+pw
     with open('connections.json', 'w') as conn:
         json.dump(c, conn)
 
