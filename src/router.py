@@ -69,7 +69,11 @@ def connect(character, target, auth, cmds):
 @click.pass_context
 def roll(ctx):
     pass
-
+@roll.command()
+@click.argument('d')
+@click.pass_obj
+def d(character,d):
+    print(f'{character} rolled {random.randrange(1, int(d)+1)}')
 
 @roll.command()
 @click.option('--stat', default=None)
