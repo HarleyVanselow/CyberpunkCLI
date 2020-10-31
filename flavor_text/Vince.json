@@ -1,18 +1,19 @@
 {
 	"type": "info",
-	"access_code":"test",
-	"admin_flavor":"Hello Vince",
-    "flavor":"Night City offers a variety of exciting places to visit! To learn more, select one",
+	"access_code":"lovemynuts",
+	"admin_flavor":"HELLO VINCE",
+    "flavor":"Swipe Up to Unlock",
     "options":[
         {
             "type":"info",
-			"header":"The Sewers",
-			"admin_flavor":"Secret Sewers",
-            "flavor":"The sewers are incredibly scenic"
+			"header":"Messages",
+			"admin_flavor":"\n Me: Tonights crew's gonna be god Read 6:23 PM \n Me: *good Read 6:23 PM \n Patrick (Scav): last weeks put up a fight but me and arnie took care of them 6:25 PM\n Me: Just did the session they split up Read 9:01 PM \n Me: These guys might need a bit of extra convincing. I got Leon to tail them. Read 9:25 PM \n Patrick (Scav): keep us posted 9:31 PM \n Patrick (Scav): vince? 10:09 PM \n Patrick (Scav): are they on their way yet? 10:22 PM",
+            "flavor":"You must unlock before accessing Messages."
         },{
             "type":"info",
-            "header":"The Docks",
-            "flavor":"The Docks are next to water"
+            "header":"Calls",
+			"flavor":"You must unlock before accessing Calls",
+			"admin_flavor": "\n Patrick (Scav) Friday 2:33 PM \n Arnie (Scav) Monday 6:17 PM \n Mommy Today 3:55 PM \n Mommy Today 5:15 PM \n Mommy Today 7:05 PM \n Patrick (Scav) Missed 10:11 PM \n Patrick (Scav) Missed 10:17 PM"
         }
     ]
 }
