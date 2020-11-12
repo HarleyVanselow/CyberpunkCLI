@@ -2,22 +2,31 @@ from src import SERVICE, SHEET_ID, TABLE
 import json
 import math
 from tabulate import tabulate
+from datetime import datetime
+from json import JSONDecodeError
 
 def disconnect_character(character):
-    c = {}
-    with open('connections.json') as conn:
+    with open('connections.json', 'r+') as conn:
         c = json.load(conn)
         c.pop(character)
-    with open('connections.json', 'w') as conn:
+        conn.seek(0)
+        conn.truncate(0)
         json.dump(c, conn)
 
 
-def connect_character(character, target,pw):
-    c = {}
-    with open('connections.json') as conn:
-        c = json.load(conn)
-        c[character] = target+':'+pw
-    with open('connections.json', 'w') as conn:
+def connect_character(character, target, pw):
+    with open('connections.json', 'r+') as conn:
+        try:
+            c = json.load(conn)
+        except JSONDecodeError:
+            c = {}
+        c[character] = {}
+        c[character]['connected_to'] = target
+        c[character]['auth'] = pw
+        c[character]['connected_at'] = str(datetime.now())
+        c[character]['commands'] = []
+        conn.seek(0)
+        conn.truncate(0)
         json.dump(c, conn)
 
 
@@ -55,6 +64,7 @@ def get_wound_status(character):
         if item[1] == 0:
             return i - 1 if i > 0 else 0
     return 8
+
 
 def get_wound_values(character):
     _, wounds_list, _ = query_character(character, 'wounds')
@@ -98,9 +108,9 @@ def deal_damage(character, new_damage):
 
     print(f'{character} health:')
     print('```')
-    print(tabulate(zip(categories,['x'*x for x in wounds_int]),tablefmt="grid"))
+    print(
+        tabulate(zip(categories, ['x'*x for x in wounds_int]), tablefmt="grid"))
     print('```')
-    
 
     wounds = [str(x) for x in wounds_int]
 

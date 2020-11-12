@@ -21,12 +21,6 @@ def route(ctx, character):
 
 
 @route.command()
-@click.pass_obj
-def test(character):
-    print(f"EDIT{character}")
-
-
-@route.command()
 @click.argument('character')
 @click.argument('property')
 def qc(call_char, character, property):
@@ -61,7 +55,8 @@ def connect(character, target, auth, cmds):
         target = json.load(target)
         admin = 'access_code' in target.keys(
         ) and auth == target['access_code']
-        connect_character(character, filename, target['access_code'] if admin else '')
+        connect_character(character, filename,
+                          target['access_code'] if admin else '')
         Base(target, admin, character, cmds=cmds).get_type().display()
 
 
@@ -69,18 +64,21 @@ def connect(character, target, auth, cmds):
 @click.pass_context
 def roll(ctx):
     pass
+
+
 @roll.command()
 @click.argument('d')
 @click.pass_obj
-def d(character,d):
+def d(character, d):
     print(f'{character} rolled {random.randrange(1, int(d)+1)}')
 
+
 @roll.command()
-@click.option('--stat', default=None)
+@click.argument('stat', default=None)
 @click.option('--D', default=10, type=click.INT)
 @click.option('--skill', default='')
 @click.pass_obj
-def skillcheck(character, stat, d, skill):
+def skill(character, stat, d, skill):
     msg = base_roll([stat], d, skill, character)
     print(msg)
 
@@ -115,6 +113,7 @@ def get_weapon_skill(weapon, character):
         skill = query_character(character, 'Rifle')[1]
     return int(float(skill))
 
+
 def get_hit_number(weapon, range):
     point_blank = 10
     close = 15
@@ -143,20 +142,24 @@ def check_hit(weapon, range, character, modifier):
     hit_number = get_hit_number(weapon, range)
     result = roll + ref + weapon_skill + modifier
     success = result >= hit_number
-    print(f"{character} {'hit' if success else 'missed'} with their {weapon.flavor} [Rolled {roll} + REF {ref} + skill {weapon_skill} with {'' if modifier<0 else '+'}{modifier} = {result} vs {hit_number}]")
+    print(
+        f"{character} {'hit' if success else 'missed'} with their {weapon.flavor} [Rolled {roll} + REF {ref} + skill {weapon_skill} with {'' if modifier<0 else '+'}{modifier} = {result} vs {hit_number}]")
     return success
+
 
 def check_melee_hit(character, opponent, skill, modifiers, attack):
     attack = 'smashe' if attack is None else attack
-    attacker_ref = int(query_character(character,'ref')[1])
-    defender_ref = int(query_character(opponent,'ref')[1])
+    attacker_ref = int(query_character(character, 'ref')[1])
+    defender_ref = int(query_character(opponent, 'ref')[1])
     attacker_roll = random.randrange(1, 11)
     defender_roll = random.randrange(1, 11)
     attacker_result = attacker_ref + attacker_roll + modifiers
     defender_result = defender_ref + defender_roll
     success = attacker_result > defender_result
-    print(f"{character} {attack+'d' if success else 'failed'} [Rolled {attacker_roll} + skill {skill} + REF {attacker_ref}  with {'' if modifiers<0 else '+'}{modifiers} = {attacker_result} vs {defender_result}]")
+    print(
+        f"{character} {attack+'d' if success else 'failed'} [Rolled {attacker_roll} + skill {skill} + REF {attacker_ref}  with {'' if modifiers<0 else '+'}{modifiers} = {attacker_result} vs {defender_result}]")
     return success
+
 
 def melee_attack(character, opponent, modifiers, loc, weapon=None, attack=None):
     skill = 0
@@ -188,14 +191,14 @@ def melee_attack(character, opponent, modifiers, loc, weapon=None, attack=None):
             brawl = query_character(character, 'brawling')[1]
             skill += 0 if brawl == '' else int(brawl)
         if attack == 'strike':
-            damage = round(random.randrange(1,7)/2) + btm
+            damage = round(random.randrange(1, 7)/2) + btm
         elif attack == 'kick':
-            damage = random.randrange(1,7) + btm
+            damage = random.randrange(1, 7) + btm
     elif weapon is not None:
         melee = query_character(character, 'melee')[1]
         skill += 0 if melee == '' else int(melee)
         damage = roll_damage(weapon)
-    
+
     if not check_melee_hit(character, opponent, skill, modifiers, attack):
         return
     if attack is not None and attack not in ['strike', 'kick']:
@@ -203,9 +206,11 @@ def melee_attack(character, opponent, modifiers, loc, weapon=None, attack=None):
     msg = f"Hit {opponent}'s {loc}, dealing "
     sp = query_character(opponent, loc)[1]
     rolled = damage
-    final_damage = calculate_damage(sp, btm, msg, damage, loc, opponent, rolled)
+    final_damage = calculate_damage(
+        sp, btm, msg, damage, loc, opponent, rolled)
     deal_damage(opponent, final_damage)
-    
+
+
 def roll_damage(weapon):
     # Roll for damage
     # Assuming weapon.damage_ammo is always in the form of "XDY+Z (mm)"
@@ -222,6 +227,7 @@ def roll_damage(weapon):
     for i in range(times):
         damage += random.randrange(1, d+1)
     return damage
+
 
 @roll.command()
 @click.argument('weapon_name')
@@ -258,7 +264,8 @@ def attack(character, weapon_name, opponent, distance, modifiers, target):
         loc = target
         modifier -= 4
 
-    melee_attacks = ['strike','kick','block','parry','dodge','disarm','throw','hold','escape','choke','trip','grapple']
+    melee_attacks = ['strike', 'kick', 'block', 'parry', 'dodge',
+                     'disarm', 'throw', 'hold', 'escape', 'choke', 'trip', 'grapple']
     if weapon_name.lower() in melee_attacks:
         return melee_attack(character, opponent, modifier, loc, attack=weapon_name.lower())
     weapon = get_weapon_from_character(character, weapon_name)
@@ -279,8 +286,9 @@ def attack(character, weapon_name, opponent, distance, modifiers, target):
     damage = rolled
 
     # Compute final damage on opponent
-    damage = calculate_damage(sp, btm, msg, damage, loc, opponent, rolled)    
+    damage = calculate_damage(sp, btm, msg, damage, loc, opponent, rolled)
     deal_damage(opponent, damage)
+
 
 def calculate_damage(sp, btm, msg, damage, loc, opponent, rolled):
     sp_msg = ''
@@ -310,6 +318,7 @@ def calculate_damage(sp, btm, msg, damage, loc, opponent, rolled):
             print(f"{opponent}'s {loc} is mangled beyond recognition")
             death_save(opponent, 3)
     return damage
+
 
 @roll.command()
 @click.argument('character')

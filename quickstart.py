@@ -7,31 +7,47 @@ import shlex
 import time
 from discord import DMChannel
 from src import TABLE
+from src.sheetio import disconnect_character
+from datetime import datetime, timedelta
+from json import JSONDecodeError
 client = discord.Client()
 
+connection_duration = timedelta(seconds=90)
 
 class MyClient(discord.Client):
     async def on_ready(self):
         print('Logged on as {0}!'.format(self.user))
 
     async def on_message(self, message):
-        if message.content.startswith("!cp"):
-            m = message.content.split('!cp ')[1]
+        if not message.author.bot:
+            m = message.content
             guild = client.guilds[0]
             member = await guild.fetch_member(message.author.id)
             character = member.display_name
-            args = ['--character',character]
+            args = ['--character', character]
             connected = False
-            with open('connections.json') as conns:
-                connections = json.load(conns)
-                if character in connections.keys():
+            conn = open('connections.json', 'r+')
+            try:
+                connections = json.load(conn)
+            except JSONDecodeError:
+                connections = {}
+            if character in connections.keys():
+                connection = connections[character]
+                connection_time = datetime.strptime(connection['connected_at'], '%Y-%m-%d %H:%M:%S.%f')
+                now = datetime.now()
+                if (connection_time + connection_duration) >= now:
+                    auth = connection['auth']
+                    connection['commands'].append(m)
+                    args += ['connect', connection['connected_to'], '--cmds',
+                            ':'.join(connection['commands']), '--auth', auth]
                     connected = True
-                    connection = connections[character].split(":")
-                    auth = connection[1]
-                    connection.append(m)
-                    args += ['connect', connection[0], '--cmds', ':'.join(connection[2:]), '--auth', auth]
+                    conn.close()
                 else:
+                    disconnect_character(character)
                     args += shlex.split(m)
+            else:
+                conn.close()
+                args += shlex.split(m)
             runner = CliRunner()
             print(args)
             try:
@@ -43,7 +59,7 @@ class MyClient(discord.Client):
                 m = ">>>" + m
             if m != "":
                 await message.channel.send(m)
-            TABLE = {}
+
 
 client = MyClient()
 client.run(os.environ['DISCORD_TOKEN'])
