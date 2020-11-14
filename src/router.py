@@ -73,12 +73,12 @@ def d(character, d):
     print(f'{character} rolled {random.randrange(1, int(d)+1)}')
 
 
-@roll.command()
+@route.command()
 @click.argument('stat', default=None)
 @click.option('--D', default=10, type=click.INT)
 @click.option('--skill', default='')
 @click.pass_obj
-def skill(character, stat, d, skill):
+def check(character, stat, d, skill):
     msg = base_roll([stat], d, skill, character)
     print(msg)
 
@@ -153,11 +153,11 @@ def check_melee_hit(character, opponent, skill, modifiers, attack):
     defender_ref = int(query_character(opponent, 'ref')[1])
     attacker_roll = random.randrange(1, 11)
     defender_roll = random.randrange(1, 11)
-    attacker_result = attacker_ref + attacker_roll + modifiers
+    attacker_result = attacker_ref + attacker_roll + modifiers + skill
     defender_result = defender_ref + defender_roll
     success = attacker_result > defender_result
     print(
-        f"{character} {attack+'d' if success else 'failed'} [Rolled {attacker_roll} + skill {skill} + REF {attacker_ref}  with {'' if modifiers<0 else '+'}{modifiers} = {attacker_result} vs {defender_result}]")
+        f"{character} {attack+'d' if success else 'failed'} [Rolled {attacker_roll} + skill {skill} + REF {attacker_ref} with {'' if modifiers<0 else '+'}{modifiers} = {attacker_result} vs {defender_result}]")
     return success
 
 
@@ -229,14 +229,27 @@ def roll_damage(weapon):
     return damage
 
 
-@roll.command()
+@route.command()
+@click.pass_obj
+def help(character):
+    print('Common commands:')
+    print(
+        '"check" : Roll a skill check. Format: check [STAT] --skill [SKILL]. Example: "check emp --skill persuasion"')
+    print(
+        '"attack" : Roll an attack. Format: attack [weapon] [target] [distance]. Example: "attack kick Franklin  / attack x-22 Franklin 30')
+    print(
+        '"connect" : Connect to an shop or info terminal. Format: connect [NAME] --auth [password]. Example: "connect vince --auth lovemynuts"')
+    print('"roll" : Do a specific check. Examples: "roll save stun", "roll initiative", "roll facedown"')
+
+
+@route.command()
 @click.argument('weapon_name')
 @click.argument('opponent')
 @click.argument('distance', default=0)
 @click.option('--modifiers', default='')
 @click.option('--target', type=click.Choice(['head', 'torso', 'right arm', 'left arm', 'right leg', 'left leg']), default=None)
 @click.pass_obj
-def attack(character, weapon_name, opponent, distance, modifiers, target):
+def attack(character, opponent, weapon_name, distance, modifiers, target):
     """
     :param weapon: Pick a weapon from your inventory to use in the 
         current combat round. Allowed values: Names of weapons you own.
@@ -370,9 +383,63 @@ def death_save(character, ws=None):
     print(
         f'Death save {status}: rolled {roll} vs {bt - wound_status - 3} [body type ({bt}) - wound status ({wound_status - 3})]')
 
+def fumble(stats, is_combat):
+    print("Fumble! Rolling for consequences...")
+    fumble_table = {
+        'ref': {
+            "combat": {
+                (1, 5): "You just screw up",
+                (5, 6): "You drop your weapon",
+                (6, 7): "Weapon discharges (make reliability roll for non autoweap) or strikes something harmless",
+                (7, 8): "You manage to wound yourself. Roll for location",
+                (8, 11): "You manage to wound a member of your own party"
+            },
+            "athletics": {
+                (1, 5): """You just mess up and make an idiot of yourself""",
+                (5, 8): """You fail miserably. Take 1 point in minor damage (sprain, fall stumble) plus make a save vs Stun""",
+                (8, 11): """You fail abysmally. If a physical action, take 1D6 in damage from falling or strained muscles. Also make a roll vs Stun at -1"""
+            }
+        },
+        'tech': {
+            (1, 5): """You just can't get it together""",
+            (5, 8): """You not only fail, you make it worse! You drop the tools you're working with, or you lose your grip and damage the thing you're working with even more. Raise the Difficulty by 5 points and try again""",
+            (8, 11): """Wow. Did you ever blow it! You damaged the device or creation beyond repair. Buy a new one."""
+        },
+        'emp': {
+            (1, 5): """They just don't buy it""",
+            (5, 7): """So much for _your_ people skills. You not only don't convince them; you leave them totally cold (-4 to your next EMP roll) to any other suggestion you might have""",
+            (7, 11): """Yow! You blew it royally. You not only didn't convice them, but now they're actually violently opposed to anyhting you want to do. Roll 1D10, on 1-4 they actually attempt to do you physical harm"""
+        },
+        'int': {
+            (1, 5): """You just dont know how to do it. You don't know what's going on. You carry on, oblivious to higher concerns""",
+            (5, 8): """You don't know anything about what's going on, and you haven't a clue about how to do anything about it. Make a Convince check at -2 to see if anyone else noticies how dumb you are""",
+            (8, 11): """Wow, are _you_ obvlivious. You not only don't know what's going on or anything about the subject, but _everyone_ knows how ignorant you are"""
+        }
+    }
+    check_stat = stats[0]
+    fumble = random.randrange(1, 11)
+    roll = f"Rolled {fumble}: "
+    if check_stat == 'ref':
+        if is_combat:
+            return roll + next(v for k, v in fumble_table['ref']
+                        ['combat'].items() if fumble in range(k[0], k[1]))
+        else:
+            return roll + next(v for k, v in fumble_table['ref']
+                        ['athletics'].items() if fumble in range(k[0], k[1]))
+    else:
+        return roll + next(v for k, v in fumble_table[check_stat].items()
+                    if fumble in range(k[0], k[1]))
 
-def base_roll(stats, d, skill, character):
-    result = random.randrange(1, d+1)
+def base_roll(stats, d, skill, character, is_combat=False):
+    # result = random.randrange(1, d+1)
+    result = 1
+    if result == d:
+        print(f'Rolled a {result}: critical success! Rolling again...')
+        result += random.randrange(1, d+1)
+    if result == 1:
+        return fumble(stats, is_combat)
+        
+
     stat_results = {}
     for stat in stats:
         stat_results[stat] = query_character(character, stat)[1]
