@@ -242,6 +242,10 @@ def update_character(character, property, value):
         else:
             v = [value]
         body = {'values': v}
+        global TABLE
+        # Invalidate cache
+        if character in TABLE.keys():
+            TABLE.pop(character)
         update_sheet(
             spreadsheetId=SHEET_ID,
             range=f'{character}!{query}',

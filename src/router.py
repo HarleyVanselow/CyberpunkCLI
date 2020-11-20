@@ -431,8 +431,7 @@ def fumble(stats, is_combat):
                     if fumble in range(k[0], k[1]))
 
 def base_roll(stats, d, skill, character, is_combat=False):
-    # result = random.randrange(1, d+1)
-    result = 1
+    result = random.randrange(1, d+1)
     if result == d:
         print(f'Rolled a {result}: critical success! Rolling again...')
         result += random.randrange(1, d+1)
